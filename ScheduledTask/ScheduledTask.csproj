@@ -331,10 +331,6 @@
       <Project>{b404b9c4-285c-46dd-b189-ae2de7a6773f}</Project>
       <Name>ImageSolutions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanMarIntegration\SanMarIntegration.csproj">
-      <Project>{3843f8e0-a732-49e9-b576-59e6044028de}</Project>
-      <Name>SanMarIntegration</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">

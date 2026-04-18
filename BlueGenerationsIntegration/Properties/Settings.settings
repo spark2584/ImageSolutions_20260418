@@ -1,9 +1,0 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="BlueGenerationsIntegration.Properties" GeneratedClassName="Settings">
-  <Profiles />
-  <Settings>
-    <Setting Name="BlueGenerationsIntegration_com_bluegeneration_promostandards_promoinventoryservice_PromoInventoryService" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://promostandards.bluegeneration.com/Services/PromoInventoryService.svc</Value>
-    </Setting>
-  </Settings>
-</SettingsFile>
