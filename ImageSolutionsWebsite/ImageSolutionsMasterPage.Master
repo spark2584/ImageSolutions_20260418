@@ -1,0 +1,157 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="ImageSolutionsMasterPage.master.cs" Inherits="ImageSolutionsWebsite.ImageSolutionsMasterPage1" %>
+
+
+<%@ Register Src="~/Control/Breadcrumb.ascx" TagPrefix="uc1" TagName="Breadcrumb" %>
+<%@ Register Src="~/Control/Header.ascx" TagPrefix="uc1" TagName="Header" %>
+<%@ Register Src="~/Control/Footer.ascx" TagPrefix="uc1" TagName="Footer" %>
+<%@ Register Src="~/Control/ThemeSetting.ascx" TagPrefix="uc1" TagName="ThemeSetting" %>
+<%@ Register Src="~/Control/WebsiteMessage.ascx" TagPrefix="uc1" TagName="WebsiteMessage" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="multikart">
+    <meta name="keywords" content="multikart">
+    <meta name="author" content="multikart">
+    <link rel="icon" href="/assets/images/favicon/1.png" type="image/x-icon">
+    <link rel="shortcut icon" href="/assets/images/favicon/1.png" type="image/x-icon">
+    <!--Google font-->
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/font-awesome.css">
+    <!--Slick slider css-->
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/slick.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/slick-theme.css">
+    <!-- Animate icon -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/animate.css">
+    <!-- Themify icon -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/themify-icons.css">
+    <!-- Bootstrap css -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/bootstrap.css">
+    <!-- Theme css -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/style.css">
+    <title></title>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body class="theme-color-1">
+    <form id="form1" runat="server">
+        <asp:ScriptManager ID="ToolkitScriptManager" runat="server" ScriptMode="Release" ScriptPath=""></asp:ScriptManager>
+        <div>
+            <asp:ContentPlaceHolder ID="cphHeader" runat="server"></asp:ContentPlaceHolder>
+            
+
+
+            <header>
+                <div class="mobile-fix-option"></div>
+                <div class="top-header">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="header-contact">
+
+                                </div>
+                            </div>
+                            <div class="col-lg-6 text-end">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="main-menu">
+                                <div class="menu-left">
+                                    <%--<div class="navbar">
+                                        <a href="javascript:void(0)" onclick="openNav()">
+                                            <div class="bar-style"> <i class="fa fa-bars sidebar-bar" aria-hidden="true"></i>
+                                            </div>
+                                        </a>
+                                        <div id="mySidenav" class="sidenav">
+                                            <a href="javascript:void(0)" class="sidebar-overlay" onclick="closeNav()"></a>
+                                            <nav>
+                                                <div onclick="closeNav()">
+                                                    <div class="sidebar-back text-start">
+                                                        <i class="fa fa-angle-left pe-2" aria-hidden="true"></i> Back
+                                                    </div>
+                                                </div>
+                                                <uc1:VirtualMenu runat="server" id="VirtualMenu" />
+                                            </nav>
+                                        </div>
+                                    </div>--%>
+                                    <div class="brand-logo">
+                                        <img id="imgLogo" runat="server" src="/assets/images/icon/logo.png" style="max-width:280px;max-height:100px;" class="img-fluid blur-up lazyload" alt="">
+                                    </div>
+                                </div>
+                                <div class="menu-right pull-right">
+                                    <div>
+                                        <nav id="main-nav">
+                                            <div class="toggle-nav"><i class="fa fa-bars sidebar-bar"></i></div>
+                                            <%--<uc1:VirtualMenuHeader runat="server" id="VirtualMenuHeader" />--%>
+                                        </nav>
+                                    </div>
+                                    <div>
+                                        <div class="icon-nav">
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+
+
+
+            <%--<uc1:Breadcrumb runat="server" id="ucBreadcrumb" />--%>
+            <!--section start-->
+            <asp:ContentPlaceHolder ID="cphBody" runat="server"></asp:ContentPlaceHolder>
+            <!--section end-->           
+            <%--<uc1:Footer runat="server" id="ucFooter" />
+            <uc1:ThemeSetting runat="server" id="ucThemeSetting" visible="false" />--%>
+            <!-- tap to top start -->
+            <div class="tap-top">
+                <div><i class="fa fa-angle-double-up"></i></div>
+            </div>
+            <!-- tap to top end -->
+            <!-- latest jquery-->
+            <script src="/assets/js/jquery-3.3.1.min.js"></script>
+            <!-- menu js-->
+            <script src="/assets/js/menu.js"></script>
+            <!-- lazyload js-->
+            <script src="/assets/js/lazysizes.min.js"></script>
+            <!-- slick js-->
+            <script src="/assets/js/slick.js"></script>
+            <!-- Bootstrap js-->
+            <script src="/assets/js/bootstrap.bundle.min.js"></script>
+            <!-- Bootstrap Notification js-->
+            <script src="/assets/js/bootstrap-notify.min.js"></script>
+            <!-- Zoom js-->
+            <script src="/assets/js/jquery.elevatezoom.js"></script>
+            <!-- Theme js-->
+            <script src="/assets/js/theme-setting.js"></script>
+            <script src="/assets/js/script.js"></script>
+            <script>
+                function openSearch() {
+                    document.getElementById("search-overlay").style.display = "block";
+                }
+
+                function closeSearch() {
+                    document.getElementById("search-overlay").style.display = "none";
+                }
+            </script>
+            <%--<uc1:WebsiteMessage runat="server" id="WebsiteMessage" />--%>
+            <asp:ContentPlaceHolder ID="cphFooter" runat="server"></asp:ContentPlaceHolder>
+        </div>
+    </form>
+</body>
+</html>

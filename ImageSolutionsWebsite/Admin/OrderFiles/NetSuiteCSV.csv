@@ -1,0 +1,3 @@
+BatchNumber,CustomerInternalID,CustomerName,LocationInternalID,LocationName,ItemName,Quantity,Memo,Reference,ShippingAttention,ShippingAddressee,ShippingAddressLine1,ShippingAddressLine2,City,State,Zip
+1-13-2025 ABS Batch,682242,Albertsons Companies : Albertsons Corporate : Albertsons Corporate Personnel : Albertsons Safeway Pharmacy Learning and Development,3,Torrance CA,200 : AL248-WH-XL,2,57/6672983,033 Shaws,David Schwartz,,351 Gary Moore Road,,Ellsworth,ME,04605,
+1-13-2025 ABS Batch,682242,Albertsons Companies : Albertsons Corporate : Albertsons Corporate Personnel : Albertsons Safeway Pharmacy Learning and Development,3,Torrance CA,200 : AL248-WH-S,2,57/6672983,033 Shaws,David Schwartz,,351 Gary Moore Road,,Ellsworth,ME,04605,

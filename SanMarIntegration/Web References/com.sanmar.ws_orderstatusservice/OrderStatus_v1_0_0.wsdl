@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.promostandards.org/WSDL/OrderStatusService/1.0.0/" name="OrderStatus_v1_0_0" targetNamespace="http://www.promostandards.org/WSDL/OrderStatusService/1.0.0/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema elementFormDefault="qualified" targetNamespace="http://www.promostandards.org/WSDL/OrderStatusService/1.0.0/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <xsd:element name="GetOrderStatusDetailsRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="wsVersion">
+              <xsd:annotation>
+                <xsd:documentation>The Standard Version of the Web Service being referenced</xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:token">
+                  <xsd:minLength value="1" />
+                  <xsd:maxLength value="64" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="id">
+              <xsd:annotation>
+                <xsd:documentation>The customerID or any other agreed upon ID.</xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:token">
+                  <xsd:minLength value="1" />
+                  <xsd:maxLength value="64" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element minOccurs="0" name="password">
+              <xsd:annotation>
+                <xsd:documentation>
+              The password associated with the customerID.
+            </xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:token">
+                  <xsd:minLength value="1" />
+                  <xsd:maxLength value="64" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="queryType" type="xsd:int">
+              <xsd:annotation>
+                <xsd:documentation>
+              The type of query you wish to perform. 1 = PO Number, 2 = Sales Order Number, 3 = Last update, 4 = All Open
+            </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element minOccurs="0" name="referenceNumber">
+              <xsd:annotation>
+                <xsd:documentation>
+              The purchase order number associated with the Order. If you pass in a purchaseOrderNumber then you will expect to a response of an array with a SINGLE order status for that purchase order.  If this field is left blank it will assume that you are requesting multiple order statuses.
+            </xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:token">
+                  <xsd:minLength value="1" />
+                  <xsd:maxLength value="64" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element minOccurs="0" name="statusTimeStamp" nillable="true" type="xsd:dateTime">
+              <xsd:annotation>
+                <xsd:documentation>
+              Beginning date time since last status change. This field will indicate the change date time for any status change GREATER the date time stamp provided.
+            </xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetOrderStatusDetailsResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="OrderStatusArray">
+              <xsd:annotation>
+                <xsd:documentation>
+              An Array of order status
+            </xsd:documentation>
+              </xsd:annotation>
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element maxOccurs="unbounded" name="OrderStatus">
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element name="purchaseOrderNumber">
+                          <xsd:annotation>
+                            <xsd:documentation>
+                          The associated Purchase Order Number from the customer
+                        </xsd:documentation>
+                          </xsd:annotation>
+                          <xsd:simpleType>
+                            <xsd:restriction base="xsd:token">
+                              <xsd:minLength value="1" />
+                              <xsd:maxLength value="64" />
+                            </xsd:restriction>
+                          </xsd:simpleType>
+                        </xsd:element>
+                        <xsd:element name="OrderStatusDetailArray">
+                          <xsd:annotation>
+                            <xsd:documentation>
+                          Array of OrderStatusDetail
+                        </xsd:documentation>
+                          </xsd:annotation>
+                          <xsd:complexType>
+                            <xsd:sequence>
+                              <xsd:element maxOccurs="unbounded" name="OrderStatusDetail">
+                                <xsd:complexType>
+                                  <xsd:sequence>
+                                    <xsd:element name="factoryOrderNumber">
+                                      <xsd:annotation>
+                                        <xsd:documentation>
+                                      The associated factory sales order number 
+                                      (This is used in the example of internal PO splitting at the factory level)
+                                    </xsd:documentation>
+                                      </xsd:annotation>
+                                      <xsd:simpleType>
+                                        <xsd:restriction base="xsd:token">
+                                          <xsd:minLength value="1" />
+                                          <xsd:maxLength value="64" />
+                                        </xsd:restriction>
+                                      </xsd:simpleType>
+                                    </xsd:element>
+                                    <xsd:element name="statusID">
+                                      <xsd:annotation>
+                                        <xsd:documentation>
+                                      Paired standard order status from allowed values
+                                    </xsd:documentation>
+                                      </xsd:annotation>
+                                      <xsd:simpleType>
+                                        <xsd:restriction base="xsd:integer">
+                                          <xsd:enumeration value="10" />
+                                          <xsd:enumeration value="11" />
+                                          <xsd:enumeration value="20" />
+                                          <xsd:enumeration value="20" />
+                                          <xsd:enumeration value="30" />
+                                          <xsd:enumeration value="40" />
+                                          <xsd:enumeration value="41" />
+                                          <xsd:enumeration value="42" />
+                                          <xsd:enumeration value="43" />
+                                          <xsd:enumeration value="44" />
+                                          <xsd:enumeration value="60" />
+                                          <xsd:enumeration value="70" />
+                                          <xsd:enumeration value="75" />
+                                          <xsd:enumeration value="80" />
+                                          <xsd:enumeration value="99" />
+                                        </xsd:restriction>
+                                      </xsd:simpleType>
+                                    </xsd:element>
+                                    <xsd:element minOccurs="0" name="statusName">
+                                      <xsd:annotation>
+                                        <xsd:documentation>
+                                      Textual description of statusID
+                                    </xsd:documentation>
+                                      </xsd:annotation>
+                                      <xsd:simpleType>
+                                        <xsd:restriction base="xsd:token">
+                                          <xsd:minLength value="1" />
+                                          <xsd:maxLength value="256" />
+                                        </xsd:restriction>
+                                      </xsd:simpleType>
+                                    </xsd:element>
+                                    <xsd:element minOccurs="0" name="expectedShipDate" nillable="true" type="xsd:dateTime">
+                                      <xsd:annotation>
+                                        <xsd:documentation>
+                                      The expected ship date for the purchase order
+                                    </xsd:documentation>
+                                      </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element minOccurs="0" name="expectedDeliveryDate" nillable="true" type="xsd:dateTime">
+                                      <xsd:annotation>
+                                        <xsd:documentation>
+                                      The expected date the order should arrive at customer also known as the in hands date </xsd:documentation>
+                                      </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element minOccurs="0" name="ResponseToArray">
+                                      <xsd:annotation>
+                                        <xsd:documentation>
+                                      An array of human contact information such as email, phone, and rep name so the distributor knows who to get in contact to fix an issue.
+                                    </xsd:documentation>
+                                      </xsd:annotation>
+                                      <xsd:complexType>
+                                        <xsd:sequence>
+                                          <xsd:element maxOccurs="unbounded" name="RespondTo">
+                                            <xsd:complexType>
+                                              <xsd:sequence>
+                                                <xsd:element minOccurs="0" name="name">
+                                                  <xsd:annotation>
+                                                    <xsd:documentation>
+                                                  The name of the person to respond to
+                                                </xsd:documentation>
+                                                  </xsd:annotation>
+                                                  <xsd:simpleType>
+                                                    <xsd:restriction base="xsd:token">
+                                                      <xsd:minLength value="1" />
+                                                      <xsd:maxLength value="256" />
+                                                    </xsd:restriction>
+                                                  </xsd:simpleType>
+                                                </xsd:element>
+                                                <xsd:element minOccurs="0" name="emailAddress">
+                                                  <xsd:annotation>
+                                                    <xsd:documentation>
+                                                  A monitored email address that a recipient can send their response to
+                                                </xsd:documentation>
+                                                  </xsd:annotation>
+                                                  <xsd:simpleType>
+                                                    <xsd:restriction base="xsd:token">
+                                                      <xsd:minLength value="1" />
+                                                      <xsd:maxLength value="256" />
+                                                    </xsd:restriction>
+                                                  </xsd:simpleType>
+                                                </xsd:element>
+                                                <xsd:element minOccurs="0" name="phoneNumber">
+                                                  <xsd:annotation>
+                                                    <xsd:documentation>
+                                                  The phone number of the person to respond to
+                                                </xsd:documentation>
+                                                  </xsd:annotation>
+                                                  <xsd:simpleType>
+                                                    <xsd:restriction base="xsd:token">
+                                                      <xsd:minLength value="1" />
+                                                      <xsd:maxLength value="32" />
+                                                    </xsd:restriction>
+                                                  </xsd:simpleType>
+                                                </xsd:element>
+                                              </xsd:sequence>
+                                            </xsd:complexType>
+                                          </xsd:element>
+                                        </xsd:sequence>
+                                      </xsd:complexType>
+                                    </xsd:element>
+                                    <xsd:element minOccurs="0" name="additionalExplanation">
+                                      <xsd:annotation>
+                                        <xsd:documentation>
+                                      This allows further detail about the status
+                                    </xsd:documentation>
+                                      </xsd:annotation>
+                                      <xsd:simpleType>
+                                        <xsd:restriction base="xsd:string">
+                                          <xsd:minLength value="1" />
+                                          <xsd:maxLength value="1024" />
+                                        </xsd:restriction>
+                                      </xsd:simpleType>
+                                    </xsd:element>
+                                    <xsd:element minOccurs="0" name="responseRequired" type="xsd:boolean">
+                                      <xsd:annotation>
+                                        <xsd:documentation>
+                                      True or False to determine if it is necessary to provide information back to the supplier to complete the order
+                                    </xsd:documentation>
+                                      </xsd:annotation>
+                                    </xsd:element>
+                                    <xsd:element name="validTimestamp" type="xsd:dateTime">
+                                      <xsd:annotation>
+                                        <xsd:documentation>
+                                      Time of order status
+                                    </xsd:documentation>
+                                      </xsd:annotation>
+                                    </xsd:element>
+                                  </xsd:sequence>
+                                </xsd:complexType>
+                              </xsd:element>
+                            </xsd:sequence>
+                          </xsd:complexType>
+                        </xsd:element>
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element minOccurs="0" name="errorMessage">
+              <xsd:annotation>
+                <xsd:documentation>
+              Response for any error requiring notification to requestor
+            </xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                  <xsd:minLength value="1" />
+                  <xsd:maxLength value="256" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetOrderStatusTypesRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="wsVersion">
+              <xsd:annotation>
+                <xsd:documentation>The Standard Version of the Web Service being referenced</xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:token">
+                  <xsd:minLength value="1" />
+                  <xsd:maxLength value="64" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="id">
+              <xsd:annotation>
+                <xsd:documentation>The customerID or any other agreed upon ID.</xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:token">
+                  <xsd:minLength value="1" />
+                  <xsd:maxLength value="64" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element minOccurs="0" name="password">
+              <xsd:annotation>
+                <xsd:documentation>
+              The password associated with the customerID.
+            </xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:token">
+                  <xsd:minLength value="1" />
+                  <xsd:maxLength value="64" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetOrderStatusTypesResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="StatusArray">
+              <xsd:annotation>
+                <xsd:documentation>
+              An Array of order statuses
+            </xsd:documentation>
+              </xsd:annotation>
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element maxOccurs="unbounded" name="Status">
+                    <xsd:annotation>
+                      <xsd:documentation>
+                    10 - Order Received (Order has been received)
+                    11 - Order Entry Hold (Vendor has a problem with the data in the purchase order, and it is preventing the order from being entered)
+                    20 - Order Confirmed (Order has been received, entered, and accepted)
+                    30 - PreProduction (Vendor has begun to process the order, but it is not in production)
+                    40 - General Hold (Something is preventing the order from being entered)
+                    41 - Credit Hold (Vendor is awaiting payment from customer)
+                    42 - Proof Hold (Vendor is awaiting response to proof)
+                    43 - Art Hold (Vendor is awaiting suitable artwork from customer)
+                    44 - Back Order (Hold Order has been backordered; Nothing has shipped yet.)
+                    60 - In Production (Production of the order has started)
+                    70 - In Storage (Order is complete, but vendor is waiting to ship goods)
+                    75 - Partial Shipment (Order has shipped in Part remaining items in production)
+                    80 - Complete (Order has shipped in fullNo further updates will be given)
+                    99 - Canceled (Order has been canceledNo further updates will be given)
+                  </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element name="id" type="xsd:int">
+                          <xsd:annotation>
+                            <xsd:documentation>
+                          The numerical value of the order status
+                        </xsd:documentation>
+                          </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="name">
+                          <xsd:annotation>
+                            <xsd:documentation>
+                          The string status name from possible values
+                        </xsd:documentation>
+                          </xsd:annotation>
+                          <xsd:simpleType>
+                            <xsd:restriction base="xsd:token">
+                              <xsd:minLength value="1" />
+                              <xsd:maxLength value="256" />
+                            </xsd:restriction>
+                          </xsd:simpleType>
+                        </xsd:element>
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element minOccurs="0" name="errorMessage">
+              <xsd:annotation>
+                <xsd:documentation>
+            Response for any error requiring notification to requestor
+          </xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                  <xsd:minLength value="1" />
+                  <xsd:maxLength value="256" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="GetOrderStatusDetailsRequestMessage">
+    <wsdl:part name="GetOrderStatusDetailsRequest" element="tns:GetOrderStatusDetailsRequest" />
+  </wsdl:message>
+  <wsdl:message name="GetOrderStatusDetailsResponseMessage">
+    <wsdl:part name="GetOrderStatusDetailsResponse" element="tns:GetOrderStatusDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetOrderStatusTypesRequestMessage">
+    <wsdl:part name="GetOrderStatusTypesRequest" element="tns:GetOrderStatusTypesRequest" />
+  </wsdl:message>
+  <wsdl:message name="GetOrderStatusTypesResponseMessage">
+    <wsdl:part name="GetOrderStatusTypesResponse" element="tns:GetOrderStatusTypesResponse" />
+  </wsdl:message>
+  <wsdl:portType name="OrderStatusService">
+    <wsdl:operation name="getOrderStatusDetails">
+      <wsdl:input message="tns:GetOrderStatusDetailsRequestMessage" />
+      <wsdl:output message="tns:GetOrderStatusDetailsResponseMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getOrderStatusTypes">
+      <wsdl:input message="tns:GetOrderStatusTypesRequestMessage" />
+      <wsdl:output message="tns:GetOrderStatusTypesResponseMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="OrderStatusServiceBinding" type="tns:OrderStatusService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getOrderStatusDetails">
+      <soap:operation soapAction="getOrderStatusDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getOrderStatusTypes">
+      <soap:operation soapAction="getOrderStatusTypes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="OrderStatusService">
+    <wsdl:port name="OrderStatusServiceBinding" binding="tns:OrderStatusServiceBinding">
+      <soap:address location="https://ws.sanmar.com:8080/promostandards/OrderStatusServiceBinding" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,5 @@
+SCC = This is a Source Code Control file
+
+[CLRFramework.sln]
+SCC_Aux_Path = "\\192.168.1.1\lexar\vss"
+SCC_Project_Name = "$/Web Applications/CLRFramework", MRBAAAAA

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://www.promostandards.org/WSDL/Inventory/2.0.0/SharedObjects/" elementFormDefault="qualified" targetNamespace="http://www.promostandards.org/WSDL/Inventory/2.0.0/SharedObjects/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="https://promostandards.bluegeneration.com/Services/PromoInventoryService.svc?xsd=xsd2" namespace="http://www.codesynthesis.com/xmlns/xsstl" />
+  <xs:element name="wsVersion" type="tns:wsVersion" />
+  <xs:simpleType name="wsVersion">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="2.0.0" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="id" type="xs:string" />
+  <xs:element name="password" type="xs:string" />
+  <xs:element name="productId" type="xs:string" />
+  <xs:element name="Filter">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="partIdArray" type="tns:ArrayOfString" />
+        <xs:element minOccurs="0" maxOccurs="1" name="LabelSizeArray" type="tns:ArrayOfLabelSize" />
+        <xs:element minOccurs="0" maxOccurs="1" name="PartColorArray" type="tns:ArrayOfString1" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfString">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="partId" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfLabelSize">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="labelSize" type="tns:labelSize" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="labelSize">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="2XL" />
+      <xs:enumeration value="2XS" />
+      <xs:enumeration value="3XL" />
+      <xs:enumeration value="3XS" />
+      <xs:enumeration value="4XL" />
+      <xs:enumeration value="4XS" />
+      <xs:enumeration value="5XL" />
+      <xs:enumeration value="5XS" />
+      <xs:enumeration value="6XL" />
+      <xs:enumeration value="6XS" />
+      <xs:enumeration value="CUSTOM" />
+      <xs:enumeration value="L" />
+      <xs:enumeration value="M" />
+      <xs:enumeration value="OSFA" />
+      <xs:enumeration value="S" />
+      <xs:enumeration value="XL" />
+      <xs:enumeration value="XS" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ArrayOfString1">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="partColor" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServiceMessageArray" type="tns:ArrayOfServiceMessage" />
+  <xs:complexType name="ArrayOfServiceMessage">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ServiceMessage">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="code" type="xs:int" />
+            <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:token" />
+            <xs:element minOccurs="1" maxOccurs="1" name="severity" type="tns:ServiceMessageSeverity" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="ServiceMessageSeverity">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Error" />
+      <xs:enumeration value="Information" />
+      <xs:enumeration value="Warning" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="Inventory">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="productId" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="PartInventoryArray" type="tns:ArrayOfPartInventoryArrayPartInventory" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfPartInventoryArrayPartInventory">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PartInventory">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="partId" type="xs:string" />
+            <xs:element minOccurs="1" maxOccurs="1" name="mainPart" type="xs:boolean" />
+            <xs:element minOccurs="0" maxOccurs="1" name="partColor" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="labelSize" type="tns:labelSize" />
+            <xs:element minOccurs="0" maxOccurs="1" name="partDescription" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="quantityAvailable">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="1" name="Quantity">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element minOccurs="1" maxOccurs="1" name="uom" type="tns:QuantityUom" />
+                        <xs:element minOccurs="1" maxOccurs="1" name="value" type="xs:decimal" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="1" maxOccurs="1" name="manufacturedItem" type="xs:boolean" />
+            <xs:element minOccurs="1" maxOccurs="1" name="buyToOrder" type="xs:boolean" />
+            <xs:element minOccurs="0" maxOccurs="1" name="replenishmentLeadTime" type="xs:int" />
+            <xs:element minOccurs="0" maxOccurs="1" name="attributeSelection" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="InventoryLocationArray" type="tns:ArrayOfInventoryLocation" />
+            <xs:element minOccurs="0" maxOccurs="1" name="lastModified" type="xs:dateTime" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="QuantityUom">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="BX" />
+      <xs:enumeration value="CA" />
+      <xs:enumeration value="DZ" />
+      <xs:enumeration value="EA" />
+      <xs:enumeration value="KT" />
+      <xs:enumeration value="PK" />
+      <xs:enumeration value="PR" />
+      <xs:enumeration value="RL" />
+      <xs:enumeration value="SL" />
+      <xs:enumeration value="ST" />
+      <xs:enumeration value="TH" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ArrayOfInventoryLocation">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="InventoryLocation">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="inventoryLocationId" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="inventoryLocationName" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="postalCode" type="xs:string" />
+            <xs:element xmlns:q1="http://www.codesynthesis.com/xmlns/xsstl" minOccurs="0" maxOccurs="1" name="country" type="q1:InventoryLocationCountry" />
+            <xs:element minOccurs="0" maxOccurs="1" name="inventoryLocationQuantity">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="1" name="Quantity">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element minOccurs="1" maxOccurs="1" name="uom" type="tns:QuantityUom" />
+                        <xs:element minOccurs="1" maxOccurs="1" name="value" type="xs:decimal" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="FutureAvailabilityArray" type="tns:ArrayOfFutureAvailability" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfFutureAvailability">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="FutureAvailability">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="Quantity">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="1" maxOccurs="1" name="uom" type="tns:QuantityUom" />
+                  <xs:element minOccurs="1" maxOccurs="1" name="value" type="xs:decimal" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="1" maxOccurs="1" name="availableOn" type="xs:dateTime" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

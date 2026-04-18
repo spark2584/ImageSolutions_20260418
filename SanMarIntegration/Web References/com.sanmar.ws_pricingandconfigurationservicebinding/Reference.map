@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DiscoveryClientResultsFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.ContractReference" url="https://ws.sanmar.com:8080/promostandards/PricingAndConfigurationServiceBinding?wsdl" filename="PricingAndConfiguration_v1_0_0.wsdl" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.SchemaReference" url="https://ws.sanmar.com:8080/promostandards/PricingAndConfigurationServiceBinding?xsd=3" filename="PricingAndConfigurationServiceBinding.xsd" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.SchemaReference" url="https://ws.sanmar.com:8080/promostandards/PricingAndConfigurationServiceBinding?xsd=2" filename="PricingAndConfigurationServiceBinding0.xsd" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.SchemaReference" url="https://ws.sanmar.com:8080/promostandards/PricingAndConfigurationServiceBinding?xsd=1" filename="PricingAndConfigurationServiceBinding1.xsd" />
+  </Results>
+</DiscoveryClientResultsFile>

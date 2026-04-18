@@ -1,0 +1,491 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B404B9C4-285C-46DD-B189-AE2DE7A6773F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ImageSolutions</RootNamespace>
+    <AssemblyName>ImageSolutions</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Avalara.AvaTax.RestClient, Version=22.11.0.0, Culture=neutral, PublicKeyToken=be94eb8ba37fd33c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Avalara.AvaTax.22.11.0\lib\net472\Avalara.AvaTax.RestClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.Memory, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Memory.9.0.0\lib\net462\Microsoft.Bcl.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.TimeProvider, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.TimeProvider.8.0.1\lib\net462\Microsoft.Bcl.TimeProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.2.1.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Abstractions, Version=8.3.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Abstractions.8.3.1\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=8.3.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.8.3.1\lib\net472\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=8.3.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.8.3.1\lib\net472\Microsoft.IdentityModel.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=8.3.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.8.3.1\lib\net472\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp, Version=108.0.3.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.108.0.3\lib\netstandard2.0\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="SendGrid, Version=9.28.1.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
+      <HintPath>..\packages\SendGrid.9.28.1\lib\net452\SendGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="Shippo, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Shippo.3.3.0\lib\net45\Shippo.dll</HintPath>
+    </Reference>
+    <Reference Include="StarkbankEcdsa, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b2e6337a5d77bfbc, processorArchitecture=MSIL">
+      <HintPath>..\packages\starkbank-ecdsa.1.3.3\lib\net452\StarkbankEcdsa.dll</HintPath>
+    </Reference>
+    <Reference Include="Stripe.net, Version=41.16.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Stripe.net.41.16.0\lib\net461\Stripe.net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Collections.Specialized, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Specialized.4.3.0\lib\net46\System.Collections.Specialized.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=8.3.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.8.3.1\lib\net472\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.4.3.2\lib\net46\System.Net.Http.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.4.3.0\lib\net462\System.Runtime.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.Cryptography.Algorithms, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Algorithms.4.3.0\lib\net463\System.Security.Cryptography.Algorithms.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Encoding, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Encoding.4.3.0\lib\net46\System.Security.Cryptography.Encoding.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Primitives.4.3.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.X509Certificates.4.3.0\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=8.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.8.0.5\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Twilio, Version=7.12.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Twilio.7.12.1\lib\net462\Twilio.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Account\Account.cs" />
+    <Compile Include="Account\AccountFilter.cs" />
+    <Compile Include="Account\AccountOrderApproval.cs" />
+    <Compile Include="Account\AccountOrderApprovalFilter.cs" />
+    <Compile Include="Address\Address.cs" />
+    <Compile Include="Address\AddressBook.cs" />
+    <Compile Include="Address\AddressBookFilter.cs" />
+    <Compile Include="Address\AddressCountry.cs" />
+    <Compile Include="Address\AddressCountryCode.cs" />
+    <Compile Include="Address\AddressCountryCodeFilter.cs" />
+    <Compile Include="Address\AddressFilter.cs" />
+    <Compile Include="Address\AddressState.cs" />
+    <Compile Include="Address\AddressTrans.cs" />
+    <Compile Include="Attribute\Attribute.cs" />
+    <Compile Include="Attribute\AttributeFilter.cs" />
+    <Compile Include="Attribute\AttributeValue.cs" />
+    <Compile Include="Attribute\AttributeValueFilter.cs" />
+    <Compile Include="Avalara\Avalara.cs" />
+    <Compile Include="Brightspeed\BrightspeedCustomer.cs" />
+    <Compile Include="Brightspeed\BrightspeedCustomerFilter.cs" />
+    <Compile Include="Brightspeed\BrightspeedCustomerImport.cs" />
+    <Compile Include="Brightspeed\BrightspeedCustomerImportFilter.cs" />
+    <Compile Include="Budget\Budget.cs" />
+    <Compile Include="Budget\BudgetAssignment.cs" />
+    <Compile Include="Budget\BudgetAssignmentAdjustment.cs" />
+    <Compile Include="Budget\BudgetAssignmentAdjustmentFilter.cs" />
+    <Compile Include="Budget\BudgetAssignmentFilter.cs" />
+    <Compile Include="Budget\BudgetFilter.cs" />
+    <Compile Include="Budget\MyBudgetAssignment.cs" />
+    <Compile Include="Category\Category.cs" />
+    <Compile Include="Category\CategoryFilter.cs" />
+    <Compile Include="CreditCard\CreditCard.cs" />
+    <Compile Include="CreditCard\CreditCardFilter.cs" />
+    <Compile Include="CreditCard\CreditCardRequestLog.cs" />
+    <Compile Include="CreditCard\CreditCardRequestLogFilter.cs" />
+    <Compile Include="CreditCard\CreditCardTransactionLog.cs" />
+    <Compile Include="CreditCard\CreditCardTransactionLogFilter.cs" />
+    <Compile Include="CreditMemo\CreditMemo.cs" />
+    <Compile Include="CreditMemo\CreditMemoFilter.cs" />
+    <Compile Include="Customer\Customer.cs" />
+    <Compile Include="Customer\CustomerEntityGroup.cs" />
+    <Compile Include="Customer\CustomerEntityGroupFilter.cs" />
+    <Compile Include="Customer\CustomerFilter.cs" />
+    <Compile Include="Customer\CustomerImport.cs" />
+    <Compile Include="Customer\CustomerImportFilter.cs" />
+    <Compile Include="Customization\Customization.cs" />
+    <Compile Include="Customization\CustomizationField.cs" />
+    <Compile Include="Customization\CustomizationFieldFilter.cs" />
+    <Compile Include="Customization\CustomizationFieldValue.cs" />
+    <Compile Include="Customization\CustomizationFieldValueFilter.cs" />
+    <Compile Include="Customization\CustomizationFilter.cs" />
+    <Compile Include="Custom\CustomField.cs" />
+    <Compile Include="Custom\CustomFieldFilter.cs" />
+    <Compile Include="Custom\CustomFieldSignature.cs" />
+    <Compile Include="Custom\CustomFieldSignatureFilter.cs" />
+    <Compile Include="Custom\CustomList.cs" />
+    <Compile Include="Custom\CustomListFilter.cs" />
+    <Compile Include="Custom\CustomListValue.cs" />
+    <Compile Include="Custom\CustomListValueFilter.cs" />
+    <Compile Include="Custom\CustomValue.cs" />
+    <Compile Include="Custom\CustomValueFilter.cs" />
+    <Compile Include="Custom\CustomValueList.cs" />
+    <Compile Include="Custom\CustomValueListFilter.cs" />
+    <Compile Include="Employee\Employee.cs" />
+    <Compile Include="Employee\EmployeeFileImport.cs" />
+    <Compile Include="Employee\EmployeeFileImportFilter.cs" />
+    <Compile Include="Employee\EmployeeFilter.cs" />
+    <Compile Include="Enterprise\EnterpriseAddress.cs" />
+    <Compile Include="Enterprise\EnterpriseAddressFilter.cs" />
+    <Compile Include="Enterprise\EnterpriseCustomer.cs" />
+    <Compile Include="Enterprise\EnterpriseCustomerEnterpriseEntityGroup.cs" />
+    <Compile Include="Enterprise\EnterpriseCustomerEnterpriseEntityGroupFilter.cs" />
+    <Compile Include="Enterprise\EnterpriseCustomerFilter.cs" />
+    <Compile Include="Enterprise\EnterpriseCustomerImport.cs" />
+    <Compile Include="Enterprise\EnterpriseCustomerImportFilter.cs" />
+    <Compile Include="Enterprise\EnterpriseEBAJob.cs" />
+    <Compile Include="Enterprise\EnterpriseEBAJobFilter.cs" />
+    <Compile Include="Enterprise\EnterpriseEntityGroup.cs" />
+    <Compile Include="Enterprise\EnterpriseEntityGroupFilter.cs" />
+    <Compile Include="Enterprise\EnterpriseEntityGroupMap.cs" />
+    <Compile Include="Enterprise\EnterpriseEntityGroupMapFilter.cs" />
+    <Compile Include="Enterprise\EnterpriseFileSubmit.cs" />
+    <Compile Include="Enterprise\EnterpriseFileSubmitFilter.cs" />
+    <Compile Include="Enterprise\EnterpriseInvoice.cs" />
+    <Compile Include="Enterprise\EnterpriseInvoiceFilter.cs" />
+    <Compile Include="Entity\EntityGroup.cs" />
+    <Compile Include="Entity\EntityGroupFilter.cs" />
+    <Compile Include="Entity\EntityGroupMap.cs" />
+    <Compile Include="Entity\EntityGroupMapFilter.cs" />
+    <Compile Include="ErrorLog\ErrorLog.cs" />
+    <Compile Include="ErrorLog\ErrorLogFilter.cs" />
+    <Compile Include="Fulfillment\Fulfillment.cs" />
+    <Compile Include="Fulfillment\FulfillmentFilter.cs" />
+    <Compile Include="Fulfillment\FulfillmentLine.cs" />
+    <Compile Include="Fulfillment\FulfillmentLineFilter.cs" />
+    <Compile Include="Group\GroupCategory.cs" />
+    <Compile Include="Group\GroupCategoryFilter.cs" />
+    <Compile Include="Invoice\Invoice.cs" />
+    <Compile Include="Invoice\InvoiceFilter.cs" />
+    <Compile Include="Invoice\InvoiceLine.cs" />
+    <Compile Include="Invoice\InvoiceLineFilter.cs" />
+    <Compile Include="Invoice\InvoicePayment.cs" />
+    <Compile Include="Invoice\InvoicePaymentFilter.cs" />
+    <Compile Include="Invoice\InvoicePaymentLine.cs" />
+    <Compile Include="Invoice\InvoicePaymentLineFilter.cs" />
+    <Compile Include="ItemReceipt\ItemReceipt.cs" />
+    <Compile Include="ItemReceipt\ItemReceiptFilter.cs" />
+    <Compile Include="ItemReceipt\ItemReceiptLine.cs" />
+    <Compile Include="ItemReceipt\ItemReceiptLineFilter.cs" />
+    <Compile Include="Item\Item.cs" />
+    <Compile Include="Item\ItemDetailValueFilter.cs" />
+    <Compile Include="Item\ItemDetailValue.cs" />
+    <Compile Include="Item\ItemDetailFilter.cs" />
+    <Compile Include="Item\ItemDetail.cs" />
+    <Compile Include="Item\ItemAttributeValue.cs" />
+    <Compile Include="Item\ItemAttributeValueFilter.cs" />
+    <Compile Include="Item\ItemFilter.cs" />
+    <Compile Include="Item\ItemPersonalization.cs" />
+    <Compile Include="Item\ItemPersonalizationFilter.cs" />
+    <Compile Include="Item\ItemPersonalizationValue.cs" />
+    <Compile Include="Item\ItemPersonalizationValueApproved.cs" />
+    <Compile Include="Item\ItemPersonalizationValueApprovedFilter.cs" />
+    <Compile Include="Item\ItemPersonalizationValueFilter.cs" />
+    <Compile Include="Item\ItemPersonalizationValueList.cs" />
+    <Compile Include="Item\ItemPersonalizationValueListFilter.cs" />
+    <Compile Include="Item\ItemPricing.cs" />
+    <Compile Include="Item\ItemPricingFilter.cs" />
+    <Compile Include="Item\ItemSelectableLogo.cs" />
+    <Compile Include="Item\ItemSelectableLogoExcludeAttribute.cs" />
+    <Compile Include="Item\ItemSelectableLogoExcludeAttributeFilter.cs" />
+    <Compile Include="Item\ItemSelectableLogoFilter.cs" />
+    <Compile Include="Item\ItemWebsite.cs" />
+    <Compile Include="Item\ItemWebsiteFilter.cs" />
+    <Compile Include="Item\MyGroupItem.cs" />
+    <Compile Include="Item\SuperceedingItem.cs" />
+    <Compile Include="Item\SuperceedingItemFilter.cs" />
+    <Compile Include="Marketing\EmailOutbox.cs" />
+    <Compile Include="Marketing\EmailOutboxFilter.cs" />
+    <Compile Include="Marketing\MarketingTemplate.cs" />
+    <Compile Include="Marketing\MarketingTemplateFilter.cs" />
+    <Compile Include="Marketing\SMSOutbox.cs" />
+    <Compile Include="Marketing\SMSOutboxFilter.cs" />
+    <Compile Include="MavisTire\MavisTireCustomer.cs" />
+    <Compile Include="MavisTire\MavisTireCustomerFilter.cs" />
+    <Compile Include="MavisTire\MavisTireCustomerImport.cs" />
+    <Compile Include="MavisTire\MavisTireCustomerImportFilter.cs" />
+    <Compile Include="Package\Package.cs" />
+    <Compile Include="Package\PackageFilter.cs" />
+    <Compile Include="Package\PackageGroup.cs" />
+    <Compile Include="Package\PackageGroupFilter.cs" />
+    <Compile Include="Package\PackageLine.cs" />
+    <Compile Include="Package\PackageLineFilter.cs" />
+    <Compile Include="Payment\Payment.cs" />
+    <Compile Include="Payment\PaymentFilter.cs" />
+    <Compile Include="Payment\PaymentTerm.cs" />
+    <Compile Include="Payment\PaymentTermAdjustment.cs" />
+    <Compile Include="Payment\PaymentTermAdjustmentFilter.cs" />
+    <Compile Include="Payment\PaymentTermFilter.cs" />
+    <Compile Include="Payout\Payout.cs" />
+    <Compile Include="Payout\PayoutFilter.cs" />
+    <Compile Include="Payout\PayoutLine.cs" />
+    <Compile Include="Payout\PayoutLineFilter.cs" />
+    <Compile Include="Paystand\AccessToken.cs" />
+    <Compile Include="Paystand\AccessTokenRequest.cs" />
+    <Compile Include="Paystand\Address.cs" />
+    <Compile Include="Paystand\AddressRequest.cs" />
+    <Compile Include="Paystand\ApplyPayment.cs" />
+    <Compile Include="Paystand\Bank.cs" />
+    <Compile Include="Paystand\Card.cs" />
+    <Compile Include="Paystand\CardRequest.cs" />
+    <Compile Include="Paystand\Fees.cs" />
+    <Compile Include="Paystand\Hold.cs" />
+    <Compile Include="Paystand\Payer.cs" />
+    <Compile Include="Paystand\PayerRequest.cs" />
+    <Compile Include="Paystand\Payment.cs" />
+    <Compile Include="Paystand\PaymentRequest.cs" />
+    <Compile Include="Paystand\Paystand.cs" />
+    <Compile Include="Paystand\PersonalContact.cs" />
+    <Compile Include="Paystand\Source.cs" />
+    <Compile Include="Promotion\Promotion.cs" />
+    <Compile Include="Promotion\PromotionBuy.cs" />
+    <Compile Include="Promotion\PromotionBuyTrans.cs" />
+    <Compile Include="Promotion\PromotionFilter.cs" />
+    <Compile Include="Promotion\PromotionGet.cs" />
+    <Compile Include="Promotion\PromotionGetTrans.cs" />
+    <Compile Include="Promotion\PromotionTrans.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PurchaseOrder\PurchaseOrder.cs" />
+    <Compile Include="PurchaseOrder\PurchaseOrderFilter.cs" />
+    <Compile Include="PurchaseOrder\PurchaseOrderLine.cs" />
+    <Compile Include="PurchaseOrder\PurchaseOrderLineFilter.cs" />
+    <Compile Include="Refund\Refund.cs" />
+    <Compile Include="Refund\RefundFilter.cs" />
+    <Compile Include="RMA\RMA.cs" />
+    <Compile Include="RMA\RMAFilter.cs" />
+    <Compile Include="RMA\RMALine.cs" />
+    <Compile Include="RMA\RMALineFilter.cs" />
+    <Compile Include="RMA\RMAReason.cs" />
+    <Compile Include="RMA\RMAReasonFilter.cs" />
+    <Compile Include="SalesOrder\SalesOrder.cs" />
+    <Compile Include="SalesOrder\SalesOrderFilter.cs" />
+    <Compile Include="SalesOrder\SalesOrderImport.cs" />
+    <Compile Include="SalesOrder\SalesOrderImportFilter.cs" />
+    <Compile Include="SalesOrder\SalesOrderLine.cs" />
+    <Compile Include="SalesOrder\SalesOrderLineFilter.cs" />
+    <Compile Include="SalesOrder\SalesOrderLineSelectableLogo.cs" />
+    <Compile Include="SalesOrder\SalesOrderLineSelectableLogoFilter.cs" />
+    <Compile Include="SelectableLogo\SelectableLogo.cs" />
+    <Compile Include="SelectableLogo\SelectableLogoFilter.cs" />
+    <Compile Include="Shipping\Restlet.cs" />
+    <Compile Include="Shipping\ShipHawkCreateProposedShipment.cs" />
+    <Compile Include="Shipping\ShipHawkCreateShipmentBody.cs" />
+    <Compile Include="Shipping\ShipHawkFinalResponse.cs" />
+    <Compile Include="Shipping\ShipHawkGetRateBody.cs" />
+    <Compile Include="Shipping\ShipHawkItem.cs" />
+    <Compile Include="Shipping\ShipHawkRate.cs" />
+    <Compile Include="Shipping\ShipHawkShipment.cs" />
+    <Compile Include="Shipping\ShiphawkShipmentDocument.cs" />
+    <Compile Include="Shipping\ShippingService.cs" />
+    <Compile Include="Shipping\ShippingServiceFilter.cs" />
+    <Compile Include="Shipping\ShippoRate.cs" />
+    <Compile Include="Shipping\ShippoShipping.cs" />
+    <Compile Include="Shipping\WebShipRate\Address.cs" />
+    <Compile Include="Shipping\WebShipRate\Available.cs" />
+    <Compile Include="Shipping\WebShipRate\Item.cs" />
+    <Compile Include="Shipping\WebShipRate\ShippingMethod.cs" />
+    <Compile Include="Shipping\WebShipRate\SiteMethods.cs" />
+    <Compile Include="Shipping\WebShipRate\WebShipRate.cs" />
+    <Compile Include="Shipping\WebShipRate\WebShipRateResponse.cs" />
+    <Compile Include="ShoppingCart\ShoppingCart.cs" />
+    <Compile Include="ShoppingCart\ShoppingCartFilter.cs" />
+    <Compile Include="ShoppingCart\ShoppingCartLine.cs" />
+    <Compile Include="ShoppingCart\ShoppingCartLineFilter.cs" />
+    <Compile Include="ShoppingCart\ShoppingCartLineSelectableLogo.cs" />
+    <Compile Include="ShoppingCart\ShoppingCartLineSelectableLogoFilter.cs" />
+    <Compile Include="ShoppingCart\ShoppingCartPromotion.cs" />
+    <Compile Include="ShoppingCart\ShoppingCartPromotionFilter.cs" />
+    <Compile Include="ShoppingCart\ShoppingCartTransfer.cs" />
+    <Compile Include="SMS\Twilio.cs" />
+    <Compile Include="Sprouts\SproutsCustomer.cs" />
+    <Compile Include="Sprouts\SproutsCustomerFilter.cs" />
+    <Compile Include="Sprouts\SproutsCustomerImport.cs" />
+    <Compile Include="Sprouts\SproutsCustomerImportFilter.cs" />
+    <Compile Include="SSO\SSOLog.cs" />
+    <Compile Include="SSO\SSOLogFilter.cs" />
+    <Compile Include="StripeAPI\StripeAPI.cs" />
+    <Compile Include="TaskEntry\TaskEntry.cs" />
+    <Compile Include="TaskEntry\TaskEntryFilter.cs" />
+    <Compile Include="TaskEntry\TaskError.cs" />
+    <Compile Include="TaskEntry\TaskErrorFilter.cs" />
+    <Compile Include="Task\Task.cs" />
+    <Compile Include="Task\TaskFilter.cs" />
+    <Compile Include="TransferOrder\TransferOrder.cs" />
+    <Compile Include="TransferOrder\TransferOrderFilter.cs" />
+    <Compile Include="TransferOrder\TransferOrderLine.cs" />
+    <Compile Include="TransferOrder\TransferOrderLineFilter.cs" />
+    <Compile Include="User\UserCreditCard.cs" />
+    <Compile Include="User\UserCreditCardFilter.cs" />
+    <Compile Include="User\UserAccount.cs" />
+    <Compile Include="User\UserAccountFilter.cs" />
+    <Compile Include="User\UserInfo.cs" />
+    <Compile Include="User\UserInfoFilter.cs" />
+    <Compile Include="User\UserWebsite.cs" />
+    <Compile Include="User\UserWebsiteFilter.cs" />
+    <Compile Include="User\UserWebsiteTab.cs" />
+    <Compile Include="User\UserWebsiteTabFilter.cs" />
+    <Compile Include="Vendor\Vendor.cs" />
+    <Compile Include="Vendor\VendorFilter.cs" />
+    <Compile Include="WebAPI\WebAPILog.cs" />
+    <Compile Include="WebAPI\WebAPILogFilter.cs" />
+    <Compile Include="Website\MyGroupWebsiteTabItem.cs" />
+    <Compile Include="Website\Website.cs" />
+    <Compile Include="Website\WebsiteCountry.cs" />
+    <Compile Include="Website\WebsiteCountryFilter.cs" />
+    <Compile Include="Website\WebsiteFilter.cs" />
+    <Compile Include="Website\WebsiteGroup.cs" />
+    <Compile Include="Website\WebsiteGroupFilter.cs" />
+    <Compile Include="Website\WebsiteGroupItem.cs" />
+    <Compile Include="Website\WebsiteGroupItemExclude.cs" />
+    <Compile Include="Website\WebsiteGroupItemExcludeFilter.cs" />
+    <Compile Include="Website\WebsiteGroupItemFilter.cs" />
+    <Compile Include="Website\WebsiteGroupItemSelectableLogo.cs" />
+    <Compile Include="Website\WebsiteGroupItemSelectableLogoFilter.cs" />
+    <Compile Include="Website\WebsiteGroupPackage.cs" />
+    <Compile Include="Website\WebsiteGroupPackageFilter.cs" />
+    <Compile Include="Website\WebsiteGroupTab.cs" />
+    <Compile Include="Website\WebsiteGroupTabFilter.cs" />
+    <Compile Include="Website\WebsiteMessage.cs" />
+    <Compile Include="Website\WebsiteMessageFilter.cs" />
+    <Compile Include="Website\WebsiteShippingService.cs" />
+    <Compile Include="Website\WebsiteShippingServiceFilter.cs" />
+    <Compile Include="Website\WebsiteShippingServiceGroup.cs" />
+    <Compile Include="Website\WebsiteShippingServiceGroupFilter.cs" />
+    <Compile Include="Website\WebsiteTab.cs" />
+    <Compile Include="Website\WebsiteTabFilter.cs" />
+    <Compile Include="Website\WebsiteTabItem.cs" />
+    <Compile Include="Website\WebsiteTabItemFilter.cs" />
+    <Compile Include="Website\WebsiteTag.cs" />
+    <Compile Include="Website\WebsiteTagFilter.cs" />
+    <Compile Include="Website\WebsiteUsefulLink.cs" />
+    <Compile Include="Website\WebsiteUsefulLinkFilter.cs" />
+    <Compile Include="ZipTax\ZipTax.cs" />
+    <Compile Include="ZipTax\ZipTaxResponse.cs" />
+    <Compile Include="ZipTax\ZipTaxResult.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CLRFramework-VS2012\CLRFramework\CLRFramework.csproj">
+      <Project>{f346ab79-0f56-4670-aa1f-fa4ac08e65ff}</Project>
+      <Name>CLRFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ISBase\ISBase\ISBase.csproj">
+      <Project>{b86a947c-71df-4632-a3c1-a62fe8ee7429}</Project>
+      <Name>ISBase</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+</Project>

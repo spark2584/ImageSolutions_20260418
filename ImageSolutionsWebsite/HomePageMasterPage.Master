@@ -1,0 +1,154 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="HomePageMasterPage.master.cs" Inherits="ImageSolutionsWebsite.HomePageMasterPage" %>
+
+<%@ Register Src="~/Control/Breadcrumb.ascx" TagPrefix="uc1" TagName="Breadcrumb" %>
+<%@ Register Src="~/Control/Header.ascx" TagPrefix="uc1" TagName="Header" %>
+<%@ Register Src="~/Control/Footer.ascx" TagPrefix="uc1" TagName="Footer" %>
+<%@ Register Src="~/Control/ThemeSetting.ascx" TagPrefix="uc1" TagName="ThemeSetting" %>
+<%@ Register Src="~/Control/WebsiteMessage.ascx" TagPrefix="uc1" TagName="WebsiteMessage" %>
+<%@ Register Src="~/Control/OptIn.ascx" TagPrefix="uc1" TagName="OptIn" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="multikart">
+    <meta name="keywords" content="multikart">
+    <meta name="author" content="multikart">
+    <link rel="icon" href="/assets/images/favicon/1.png" type="image/x-icon">
+    <link rel="shortcut icon" href="/assets/images/favicon/1.png" type="image/x-icon">
+
+    <!--Google font-->
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/font-awesome.css">
+
+    <!--Slick slider css-->
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/slick.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/slick-theme.css">
+
+    <!-- Animate icon -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/animate.css">
+
+    <!-- Themify icon -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/themify-icons.css">
+
+    <!-- Bootstrap css -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/vendors/bootstrap.css">
+
+    <!-- Theme css -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/style.css">
+    <title></title>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+
+    
+
+    <asp:Literal ID="litLocalize" runat="server" Visible="false">
+        <%--localize.js--%>
+        <script src="https://global.localizecdn.com/localize.js"></script>
+        <script>!function (a) { if (!a.Localize) { a.Localize = {}; for (var e = ["translate", "untranslate", "phrase", "initialize", "translatePage", "setLanguage", "getLanguage", "getSourceLanguage", "detectLanguage", "getAvailableLanguages", "untranslatePage", "bootstrap", "prefetch", "on", "off", "hideWidget", "showWidget"], t = 0; t < e.length; t++)a.Localize[e[t]] = function () { } } }(window);</script>
+
+        <script>
+            Localize.initialize({
+                key: 'bE1KNXfKUBWYR',
+                rememberLanguage: true,
+            });
+        </script>
+    </asp:Literal>
+
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-TBM2H3RB');</script>
+    <!-- End Google Tag Manager -->
+</head>
+<asp:Literal ID="litGA" runat="server" Visible="false">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZJ8Y8TVS7"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-1ZJ8Y8TVS7'); </script>
+</asp:Literal>
+<body class="theme-color-1">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TBM2H3RB"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <form id="form1" runat="server">
+        <asp:ScriptManager ID="ToolkitScriptManager" runat="server" ScriptMode="Release" ScriptPath=""></asp:ScriptManager>
+        <div>
+            <asp:ContentPlaceHolder ID="cphHeader" runat="server"></asp:ContentPlaceHolder>
+            <uc1:Header runat="server" id="ucHeader" />
+            <uc1:Breadcrumb runat="server" id="ucBreadcrumb" />
+            <!--section start-->
+            <asp:ContentPlaceHolder ID="cphBody" runat="server"></asp:ContentPlaceHolder>
+            <!--section end-->
+
+            
+            <uc1:Footer runat="server" id="ucFooter" />
+            <uc1:ThemeSetting runat="server" id="ucThemeSetting" visible="false" />
+
+
+            <!-- tap to top start -->
+            <div class="tap-top">
+                <div><i class="fa fa-angle-double-up"></i></div>
+            </div>
+            <!-- tap to top end -->
+
+
+            <!-- latest jquery-->
+            <script src="/assets/js/jquery-3.7.1.min.js"></script>
+
+            <!-- menu js-->
+            <script src="/assets/js/menu.js"></script>
+
+            <!-- lazyload js-->
+            <script src="/assets/js/lazysizes.min.js"></script>
+
+            <!-- slick js-->
+            <script src="/assets/js/slickautoplay.js"></script>
+
+            <!-- Bootstrap js-->
+            <script src="/assets/js/bootstrap.bundle.min.js"></script>
+
+            <!-- Bootstrap Notification js-->
+            <script src="/assets/js/bootstrap-notify.min.js"></script>
+            
+            <!-- Zoom js-->
+            <script src="/assets/js/jquery.elevatezoom.js"></script>
+
+            <!-- Theme js-->
+            <script src="/assets/js/theme-setting.js"></script>
+            <script src="/assets/js/script.js"></script>
+
+            <script>
+                function openSearch() {
+                    document.getElementById("search-overlay").style.display = "block";
+                }
+
+                function closeSearch() {
+                    document.getElementById("search-overlay").style.display = "none";
+                }
+            </script>
+
+            <uc1:OptIn runat="server" id="OptIn" />
+
+            <uc1:WebsiteMessage runat="server" id="WebsiteMessage" />
+
+            <asp:ContentPlaceHolder ID="cphFooter" runat="server"></asp:ContentPlaceHolder>
+        </div>
+    </form>
+
+    <script> (function () { var s = document.createElement('script'); var h = document.querySelector('head') || document.body; s.src = 'https://acsbapp.com/apps/app/dist/js/app.js'; s.async = true; s.onload = function () { acsbJS.init({ statementLink: '', footerHtml: '', hideMobile: false, hideTrigger: false, disableBgProcess: false, language: 'en', position: 'left', leadColor: '#146ff8', triggerColor: '#146ff8', triggerRadius: '50%', triggerPositionX: 'left', triggerPositionY: 'bottom', triggerIcon: 'people', triggerSize: 'medium', triggerOffsetX: 20, triggerOffsetY: 20, mobile: { triggerSize: 'small', triggerPositionX: 'right', triggerPositionY: 'bottom', triggerOffsetX: 10, triggerOffsetY: 10, triggerRadius: '50%' } }); }; h.appendChild(s); })(); </script>
+
+</body>
+</html>
