@@ -24,6 +24,24 @@ namespace ImageSolutionsWebsite
         protected global::System.Web.UI.WebControls.Literal litStyle;
 
         /// <summary>
+        /// pnlCategoryBreadCrumb control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlCategoryBreadCrumb;
+
+        /// <summary>
+        /// litCategoryBreadCrumb control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litCategoryBreadCrumb;
+
+        /// <summary>
         /// divLeftPanel control.
         /// </summary>
         /// <remarks>
@@ -33,6 +51,15 @@ namespace ImageSolutionsWebsite
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl divLeftPanel;
 
         /// <summary>
+        /// pnlSidebarCategories control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlSidebarCategories;
+
+        /// <summary>
         /// ucLeftPanelNavigation control.
         /// </summary>
         /// <remarks>
@@ -40,6 +67,15 @@ namespace ImageSolutionsWebsite
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::ImageSolutionsWebsite.Control.LeftPanelNavigation ucLeftPanelNavigation;
+
+        /// <summary>
+        /// rptSidebarCategories control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptSidebarCategories;
 
         /// <summary>
         /// pnlAttributeFilter control.
@@ -69,22 +105,40 @@ namespace ImageSolutionsWebsite
         protected global::System.Web.UI.WebControls.ListView lvSize;
 
         /// <summary>
-        /// pnlCategoryBreadCrumb control.
+        /// hfPriceMin control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlCategoryBreadCrumb;
+        protected global::System.Web.UI.WebControls.HiddenField hfPriceMin;
 
         /// <summary>
-        /// litCategoryBreadCrumb control.
+        /// hfPriceMax control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litCategoryBreadCrumb;
+        protected global::System.Web.UI.WebControls.HiddenField hfPriceMax;
+
+        /// <summary>
+        /// hfPriceAbsMax control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfPriceAbsMax;
+
+        /// <summary>
+        /// btnApplyPrice control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnApplyPrice;
 
         /// <summary>
         /// pnlMessage control.
@@ -130,6 +184,24 @@ namespace ImageSolutionsWebsite
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel pnlItems;
+
+        /// <summary>
+        /// ddlSort control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlSort;
+
+        /// <summary>
+        /// ddlPageSize control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlPageSize;
 
         /// <summary>
         /// ucPagerTop control.
