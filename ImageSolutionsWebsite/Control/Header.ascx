@@ -52,10 +52,6 @@
                 <div class="main-menu">
                     <div class="menu-left">
                         <div class="navbar">
-                            <a href="javascript:void(0)" onclick="openNav()">
-                                <div id="divSideMenu" runat="server" class="bar-style"> <i class="fa fa-bars sidebar-bar" aria-hidden="true"></i>
-                                </div>
-                            </a>
                             <div id="mySidenav" class="sidenav">
                                 <a href="javascript:void(0)" class="sidebar-overlay" onclick="closeNav()"></a>
                                 <nav>

@@ -63,7 +63,6 @@ namespace ImageSolutionsWebsite.Controls
             this.phLogout.Visible = ThisPage.CurrentUser.IsLoggedIn && !ThisPage.CurrentUser.IsGuest;
 
             liMyAccount.Visible = ThisPage.CurrentUser.IsLoggedIn;
-            divSideMenu.Visible = ThisPage.CurrentUser.IsLoggedIn;
 
             if (ThisPage.CurrentWebsite.IsLoggedIn)
             {

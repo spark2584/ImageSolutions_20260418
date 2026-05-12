@@ -15,6 +15,12 @@ namespace ImageSolutionsWebsite.Controls
             {
                 string strURL = Request.Url.ToString();
 
+                if (strURL.ToLower().Contains("/items.aspx") || strURL.ToLower().Contains("/productdetail.aspx"))
+                {
+                    this.Visible = false;
+                    return;
+                }
+
                 if (strURL.ToLower().Contains("/userwebsite.aspx"))
                 {
                     this.phUserWebSite.Visible = true;
