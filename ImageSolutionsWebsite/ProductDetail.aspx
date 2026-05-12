@@ -1,754 +1,847 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.Master" AutoEventWireup="true" CodeBehind="ProductDetail.aspx.cs" Inherits="ImageSolutionsWebsite.ProductDetail" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.Master" AutoEventWireup="true" CodeBehind="ProductDetail.aspx.cs" Inherits="ImageSolutionsWebsite.ProductDetail" %>
 <%@ Register src="Control/SuperceedingItem.ascx" tagname="SuperceedingItem" tagprefix="uc1" %>
 <%@ Register src="Control/ImageModal.ascx" tagname="ImageModal" tagprefix="uc2"  %>
 <%@ Register Src="Control/LeftPanelNavigation.ascx" tagname="LeftPanelNavigation" tagprefix="uc3" %>
 <%@ Register src="Control/AccountSearchModal.ascx" tagname="AccountSearchModal" tagprefix="uc4"  %>
-
 <%@ Register Src="~/Control/Pager.ascx" TagPrefix="uc1" TagName="Pager" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
-        div#divDetailedDescription ul{
-            font-family: Lato,sans-serif;
-            font-size:12px;
-            display: block;
-        }
+        /* ── Layout ── */
+        .pd-section { padding: 32px 0 60px; background: #fff; }
+        .pd-image-col { padding-right: 32px; }
 
-        /* add style only to the 'li' elements inside the id="one" div. this means 'li' inside the 'ul' inside the 'div' which its id="one" */
-        div#divDetailedDescription ul li {
-            font-family: Lato,sans-serif;
-            font-size:12px;
-            display: list-item;
-        }
+        /* ── Main image ── */
+        .pd-main-image-wrap { position: relative; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+        .pd-main-image-wrap img { width: 100%; height: auto; display: block; }
+        .pd-img-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.85); border: 1px solid #ddd; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; color: #555; z-index: 2; transition: background .2s; }
+        .pd-img-nav:hover { background: #fff; }
+        .pd-img-prev { left: 10px; }
+        .pd-img-next { right: 10px; }
 
-        div#divDetailedDescription h2{
-            font-family: Lato,sans-serif;
-            font-size:12px;
-            text-transform: unset;
-            font-weight:unset;
-            letter-spacing:unset;
-            line-height:1.5em;
-        }
+        /* ── Thumbnails ── */
+        .pd-thumbnails { display: flex; gap: 8px; justify-content: center; }
+        .pd-thumb { border: 1px solid #ddd; border-radius: 4px; overflow: hidden; cursor: pointer; width: 90px; height: 90px; flex-shrink: 0; }
+        .pd-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .pd-thumb.active { border-color: #333; }
 
-	    div#divDetailedDescription h3{
-            font-family: Lato,sans-serif;
-            font-size:12px;
-            text-transform: unset;
-            font-weight:unset;
-            letter-spacing:unset;
-            line-height:1.5em;
-        }
+        /* ── Category header bar ── */
+        .pd-category-header { background: #f2f2f2; padding: 18px 0 14px; text-align: center; width: 100%; margin-bottom: 0; padding-bottom: 20px;}
+        .pd-category-title { font-size: 28px; font-weight: 400; letter-spacing: 2px; color: #222; margin: 0 0 4px; text-transform: uppercase; font-family: Lato, sans-serif; }
+        .pd-breadcrumb { font-size: 13px; color: #222; margin: 0; }
+        .pd-breadcrumb a { color: #222; text-decoration: none; pointer-events: none; cursor: default; }
 
-        div#divDetailedDescription h4{
-            font-family: Lato,sans-serif;
-            font-size:12px;
-            text-transform: unset;
-            font-weight:unset;
-            letter-spacing:unset;
-            line-height:1.5em;
-        }
+        /* ── Details right col ── */
+        .pd-details-col { padding-left: 24px; }
+        .pd-title { font-size: 24px; font-weight: 700; color: #222 !important; margin: 0 0 8px; font-family: Lato, sans-serif; }
+        .pd-title, .pd-title * { color: #222 !important; font-size: 24px !important; text-transform: none !important; }
+        #cphBody_lblHeader { color: #222 !important; font-size: 24px !important; }
+        .pd-item-num { font-size: 13px; color: #222; margin: 0 0 6px; font-family: Lato, sans-serif; }
+        .pd-price { font-size: 22px; font-weight: 700; color: #222; margin: 10px 0 14px; font-family: Lato, sans-serif; }
 
-        div#divDetailedDescription p{
-            font-family: Lato,sans-serif;
-            font-size:12px;
-	        margin-bottom: 10px;
-        }
+        /* ── Non-inventory note ── */
+        .pd-ni-note { background: #fff8f8; border: 1px solid #f5c2c2; border-radius: 4px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: #c00; font-family: Lato, sans-serif; line-height: 1.6; }
 
-        div#divDetailedDescription span{
-            font-family: Lato,sans-serif;
-            font-size:12px;
-        }
+        /* ── Single-unit link ── */
+        .pd-single-unit { font-size: 13px; margin-bottom: 12px; font-family: Lato, sans-serif; }
+        .pd-single-unit a { color: #C01F2F; }
 
-        div#divDetailedDescription body{
-            font-family: Lato,sans-serif;
-            font-size:12px;
-        }
+        /* ── Attribute section label ── */
+        .pd-attr-label { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 8px; font-family: Lato, sans-serif; display: flex; align-items: center; gap: 8px; }
+        .pd-attr-label .pd-attr-value { font-weight: 400; color: #555; }
 
-        .ti-info-alt:before {
-           content: "\0043\0024";
+        /* ── Color swatches ── */
+        .pd-color-section { margin-bottom: 18px; }
+        .pd-swatches { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .pd-swatches li { list-style: none; margin: 0; padding: 0; background: none !important; border: none !important; }
+        .pd-swatch-btn { display: block; width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ccc; outline: none; cursor: pointer; padding: 0; overflow: hidden; }
+        .pd-swatch-btn:hover { outline: 2px solid #888; outline-offset: 2px; border-radius: 50%; }
+        .pd-swatch-btn.pd-swatch-selected { border: none; outline: 2px solid #000; outline-offset: 2px; border-radius: 50%; }
+        .pd-swatch-text { display: flex; align-items: center; justify-content: center; background: #f3f3f3; font-size: 11px; font-weight: 600; color: #333; }
+
+        /* ── Size section ── */
+        .pd-size-section { margin-bottom: 18px; }
+        .pd-size-guide-link { font-size: 12px; color: #C01F2F; text-decoration: underline; cursor: pointer; }
+        .pd-sizes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .size-btn { min-width: 48px; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; background: #fff; font-size: 13px; font-weight: 500; color: #333; cursor: pointer; transition: border-color .15s, background .15s, color .15s; font-family: Lato, sans-serif; text-align: center; }
+        .size-btn:hover:not(.out-of-stock):not(:disabled) { border-color: #333; }
+        .size-btn.active { border-color: #333; background: #333; color: #fff; }
+        .size-btn.out-of-stock { position: relative; color: #bbb; border-color: #e0e0e0; cursor: not-allowed; text-decoration: line-through; }
+
+        /* size-grid-table: flatten GridView table into flex row */
+        .size-grid-table { width: auto !important; border: none !important; }
+        .size-grid-table thead { display: none !important; }
+        .size-grid-table tbody { display: flex !important; flex-wrap: wrap; gap: 8px; }
+        .size-grid-table tr { display: contents; }
+        .size-grid-table td { display: block; padding: 0 !important; border: none !important; background: none !important; }
+        .size-btn-item { display: inline-block; }
+        .size-qty-input { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
+
+        /* ── Shared quantity control ── */
+        .pd-qty-section { margin-bottom: 20px; }
+        .pd-qty-control { display: inline-flex; align-items: center; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
+        .pd-qty-btn { width: 38px; height: 40px; border: none; background: #f5f5f5; font-size: 18px; cursor: pointer; color: #444; display: flex; align-items: center; justify-content: center; transition: background .15s; }
+        .pd-qty-btn:hover { background: #e8e8e8; }
+        .pd-qty-display { width: 52px; height: 40px; border: none; border-left: 1px solid #ccc; border-right: 1px solid #ccc; text-align: center; font-size: 15px; font-weight: 600; color: #222; -moz-appearance: textfield; outline: none; }
+        .pd-qty-display::-webkit-inner-spin-button,
+        .pd-qty-display::-webkit-outer-spin-button { -webkit-appearance: none; }
+        .pd-qty-info { font-size: 12px; color: #777; margin-top: 6px; font-family: Lato, sans-serif; }
+        .pd-unit-price { font-size: 13px; color: #444; margin-left: 12px; }
+
+        /* ── Simple qty (no-attribute items) ── */
+        .pd-simple-qty { margin-bottom: 20px; }
+
+        /* ── Action buttons ── */
+        .pd-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+        .btn-add-to-bag { background: #C01F2F; color: #fff; border: none; border-radius: 4px; padding: 12px 28px; font-size: 14px; font-weight: 600; letter-spacing: .5px; cursor: pointer; font-family: Lato, sans-serif; transition: background .2s; }
+        .btn-add-to-bag:hover:not(:disabled) { background: #a01828; color: #fff; }
+        .btn-add-to-bag:disabled, .btn-buy-now:disabled { background: #ccc !important; border-color: #ccc !important; color: #888 !important; cursor: not-allowed; }
+        .btn-buy-now { background: #C01F2F; color: #fff; border: 2px solid #C01F2F; border-radius: 4px; padding: 10px 28px; font-size: 14px; font-weight: 600; letter-spacing: .5px; cursor: pointer; font-family: Lato, sans-serif; transition: background .2s, color .2s; }
+        .btn-buy-now:hover:not(:disabled) { background: #a01828; border-color: #a01828; color: #fff; }
+        .btn-size-chart { background: none; color: #555; border: 1px solid #ccc; border-radius: 4px; padding: 10px 18px; font-size: 13px; cursor: pointer; font-family: Lato, sans-serif; transition: border-color .2s; }
+        .btn-size-chart:hover { border-color: #333; color: #222; }
+        .btn-add-more { background: none; color: #C01F2F; border: 1px solid #C01F2F; border-radius: 4px; padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: Lato, sans-serif; }
+
+        /* ── Accordion ── */
+        .pd-accordion { margin-top: 24px; border-top: 1px solid #e8e8e8; }
+        .pd-accordion-item { border-bottom: 1px solid #e8e8e8; }
+        .pd-accordion-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; cursor: pointer; font-size: 15px; font-weight: 600; color: #222; font-family: Lato, sans-serif; user-select: none; }
+        .pd-accordion-header:hover { color: #C01F2F; }
+        .pd-accordion-icon { font-size: 18px; color: #555; transition: transform .2s; }
+        .pd-accordion-body { padding-bottom: 14px; font-size: 13px; color: #555; font-family: Lato, sans-serif; line-height: 1.7; }
+        .pd-accordion-body ul { padding-left: 18px; margin: 0; }
+        .pd-accordion-body li { margin-bottom: 4px; }
+
+        /* ── Detailed description (inside accordion body) ── */
+        #divDetailedDescription ul { font-family: Lato,sans-serif; font-size: 13px; display: block; }
+        #divDetailedDescription ul li { font-family: Lato,sans-serif; font-size: 13px; display: list-item; }
+        #divDetailedDescription h2, #divDetailedDescription h3, #divDetailedDescription h4 { font-family: Lato,sans-serif; font-size: 13px; text-transform: unset; font-weight: unset; letter-spacing: unset; line-height: 1.5em; }
+        #divDetailedDescription p { font-family: Lato,sans-serif; font-size: 13px; margin-bottom: 8px; }
+        #divDetailedDescription span { font-family: Lato,sans-serif; font-size: 13px; }
+
+        /* ── Employee / Account ── */
+        .pd-employee-section { margin-bottom: 18px; }
+        .pd-employee-section .form-group { margin-bottom: 12px; }
+        .pd-employee-section label { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 4px; display: block; font-family: Lato, sans-serif; }
+
+        /* ── Dropdown / NoGroup attributes ── */
+        .pd-nogroup-attr { margin-bottom: 18px; }
+        .pd-nogroup-attr label { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 4px; display: block; font-family: Lato, sans-serif; }
+
+        /* ── Length/Width dropdown ── */
+        .pd-lw-section select { max-width: 220px; }
+
+        /* ── Customization ── */
+        .pd-customization { border: 1px solid #e8e8e8; border-radius: 6px; padding: 18px; margin-bottom: 20px; }
+        .pd-customization h5 { font-size: 15px; font-weight: 700; margin-bottom: 14px; font-family: Lato, sans-serif; }
+        .pd-logo-grid { display: flex; flex-wrap: wrap; gap: 10px; background: #f5f5f5; padding: 10px; border-radius: 4px; list-style: none; margin: 0; padding-left: 0; }
+        .pd-logo-grid li { list-style: none; }
+
+        /* ── Related items carousel ── */
+        .pd-related { margin-top: 60px; padding-top: 30px; border-top: 1px solid #e8e8e8; }
+        .pd-related h2 { font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; font-family: Lato, sans-serif; color: #222; text-align: center; }
+        .pd-related-carousel { display: flex; align-items: center; gap: 8px; }
+        .related-track { flex: 1; overflow: hidden; }
+        .related-arrow { background: #f5f5f5; border: 1px solid #ddd; border-radius: 50%; width: 36px; height: 36px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #444; transition: background .15s; padding-bottom: 6px; }
+        .related-arrow:hover { background: #e0e0e0; }
+        .pd-related-item .img-wrapper { overflow: hidden; height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .pd-related-item .img-wrapper img { max-height: 100%; max-width: 100%; object-fit: contain; }
+        .pd-related-item { text-align: center; }
+        .pd-related-item h4 a { font-size: 14px; font-weight: 500; color: #555; text-decoration: none; font-family: Lato, sans-serif; }
+        .pd-related-item h4 a:hover { color: #C01F2F; }
+        .pd-related-price { font-size: 14px; font-weight: 600; color: #222; font-family: Lato, sans-serif; }
+
+        /* ── Recommended for You (Items.aspx card style) ── */
+        .pd-recommended { margin-top: 56px; padding-top: 36px; border-top: 1px solid #e8e8e8; }
+        .pd-recommended-title { font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 28px; font-family: Lato, sans-serif; color: #222; }
+        .product-card { margin-bottom: 28px; transition: box-shadow .2s; }
+        .product-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.10); border-radius: 4px; }
+        .product-card-img { width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #f8f8f8; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+        .product-card-img img { width: 100%; height: 100%; object-fit: contain; }
+        .product-card-info { padding: 10px 8px 14px; text-align: center; }
+        .product-card-name { font-size: 13px; font-weight: 600; color: #222; margin-bottom: 4px; line-height: 1.4; }
+        .product-card-name a { color: inherit; text-decoration: none; }
+        .product-card-name a:hover { color: #ff4c3b; }
+        .product-card-price { font-size: 13px; font-weight: 600; color: #222; margin-bottom: 8px; }
+        .product-card-colors { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
+        .color-dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #ccc; display: inline-block; cursor: default; }
+
+        .ti-info-alt:before { content: "\0043\0024"; }
+
+        @media (max-width: 767px) {
+            .pd-image-col { padding-right: 15px; margin-bottom: 24px; }
+            .pd-details-col { padding-left: 15px; }
         }
     </style>
-
 </asp:Content>
+
 <asp:Content ID="Content2" ContentPlaceHolderID="cphHeader" runat="server">
 </asp:Content>
+
 <asp:Content ID="Content3" ContentPlaceHolderID="cphBody" runat="server">
-    <section class="section-b-space ratio_asos">
-        <div class="collection-wrapper">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-3 collection-filter" id="divLeftPanel" runat="server">
-                        <uc3:LeftPanelNavigation runat="server" ID="ucLeftPanelNavigation" />                                                   
+
+    <%-- Hidden left panel kept for code-behind compatibility --%>
+    <div id="divLeftPanel" runat="server" style="display:none;">
+        <uc3:LeftPanelNavigation runat="server" ID="ucLeftPanelNavigation" />
+    </div>
+
+    <%-- Category header bar --%>
+    <asp:Panel ID="pnlCategoryBreadCrumb" runat="server" CssClass="pd-category-header">
+        <div class="pd-category-title" id="divCategoryTitle"></div>
+        <div class="pd-breadcrumb" id="divCategoryBreadcrumb">
+            <asp:Literal ID="litCategoryBreadCrumb" runat="server"></asp:Literal>
+        </div>
+    </asp:Panel>
+
+    <section class="pd-section">
+        <div class="container">
+
+            <div class="row">
+
+                <%-- ══ LEFT: Image Column ══ --%>
+                <div class="col-lg-5 pd-image-col">
+                    <div class="pd-main-image-wrap">
+                        <button type="button" class="pd-img-nav pd-img-prev" onclick="pdThumbNav(-1)">&#8249;</button>
+                        <asp:Image ID="imgItem2" runat="server" alt="" CssClass="pd-main-img" Width="100%" />
+                        <button type="button" class="pd-img-nav pd-img-next" onclick="pdThumbNav(1)">&#8250;</button>
                     </div>
-                     <div class="collection-content col">
-                        <div class="page-main-content">
-                            <asp:Panel ID="pnlCategoryBreadCrumb" runat="server">
-                                <div class="collection-product-wrapper" style="font-size:larger">
-                                    <asp:Literal ID="litCategoryBreadCrumb" runat="server"></asp:Literal>
+                    <%-- Thumbnail strip — populated from main image; hidden original imgItem kept for code-behind compat --%>
+                    <asp:Image ID="imgItem" runat="server" alt="" style="display:none;" />
+                    <div class="pd-thumbnails" id="divThumbnails">
+                        <%-- JS fills these from imgItem2.src after load --%>
+                    </div>
+                </div>
+
+                <%-- ══ RIGHT: Details Column ══ --%>
+                <div class="col-lg-7 pd-details-col">
+
+                    <%-- Product name --%>
+                    <h1 class="pd-title"><span id="ItemName"><asp:Label ID="lblHeader" runat="server" Text=""></asp:Label></span></h1>
+
+                    <%-- Item number --%>
+                    <p class="pd-item-num">Item#: <span id="ItemNumber"><asp:Literal ID="litItemNumber" runat="server" Text=""></asp:Literal></span></p>
+
+                    <%-- Sales description --%>
+                    <asp:Literal ID="litSalesDescription" runat="server"></asp:Literal>
+
+                    <%-- Single-unit link --%>
+                    <asp:Panel ID="pnlSingleUnit" runat="server" CssClass="pd-single-unit">
+                        For a single unit purchase, &nbsp;<asp:HyperLink ID="btnSingleUnit" runat="server">Click Here</asp:HyperLink>
+                    </asp:Panel>
+
+                    <%-- Price --%>
+                    <p class="pd-price"><asp:Literal ID="litBasePrice" runat="server"></asp:Literal></p>
+
+                    <%-- Non-inventory message --%>
+                    <div id="divNonInventoryUnavailableMessage" runat="server" class="pd-ni-note" visible="false">
+                        <strong>PLEASE NOTE:</strong><br />
+                        This is a custom-ordered item with a 10-12 day lead time, selecting expedited shipping will NOT expedite the lead time.
+                        This item cannot be returned or exchanged due to the custom decoration.
+                        We are unable to accept orders for items which are currently unavailable – if the size is greyed out, then we do not have stock.
+                        Please check back regularly as stock levels are updated daily.
+                    </div>
+
+                    <%-- Employee / Account selectors --%>
+                    <asp:PlaceHolder ID="phEmployee" runat="server" Visible="false">
+                        <div class="pd-employee-section">
+                            <asp:PlaceHolder ID="phEmployeeAccount" runat="server" Visible="false">
+                                <div class="form-group">
+                                    <label>Store</label>
+                                    <div class="d-flex gap-2">
+                                        <asp:DropDownList ID="ddlAccount" runat="server" Width="100%" DataValueField="AccountID" DataTextField="AccountName" CssClass="form-control form-select-sm form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlAccount_SelectedIndexChanged"></asp:DropDownList>
+                                        <asp:TextBox ID="txtAccount" runat="server" CssClass="form-control" Enabled="false"></asp:TextBox>
+                                        <asp:HiddenField ID="hfAccountID" runat="server" />
+                                        <asp:LinkButton ID="btnAccountSearch" runat="server" OnClick="btnAccountSearch_Click" CssClass="btn btn-solid btn-sm" style="white-space:nowrap;">Change</asp:LinkButton>
+                                    </div>
+                                </div>
+                            </asp:PlaceHolder>
+                            <div class="form-group">
+                                <label>Employee</label>
+                                <asp:DropDownList ID="ddlUserInfo" runat="server" Width="100%" DataValueField="UserInfoID" DataTextField="FullName" CssClass="form-control form-select-sm form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlUserInfo_SelectedIndexChanged"></asp:DropDownList>
+                            </div>
+                        </div>
+                    </asp:PlaceHolder>
+
+                    <%-- ══ Item Attributes / Quantity (Repeater) ══ --%>
+                    <asp:Repeater ID="rptItems" runat="server" DataMember="ItemID" OnItemDataBound="rptItems_ItemDataBound">
+                        <ItemTemplate>
+                            <asp:HiddenField ID="hfItemID" runat="server" Value='<%# Eval("Item.ItemID")%>' />
+
+                            <%-- ── No attributes: simple quantity box ── --%>
+                            <asp:Panel ID="pnlNoAttribute" runat="server">
+                                <div class="pd-simple-qty">
+                                    <div class="pd-attr-label">Quantity</div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="pd-qty-control">
+                                            <button type="button" class="pd-qty-btn pd-qty-minus">&minus;</button>
+                                            <asp:TextBox ID="txtQuantity" runat="server" type="number" CssClass="pd-qty-display" min="0"></asp:TextBox>
+                                            <button type="button" class="pd-qty-btn pd-qty-plus">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="pd-qty-info">
+                                        <asp:Label ID="lblQuantityAvailable" runat="server"></asp:Label>
+                                        &nbsp;<a id="aSuperceedingItem" runat="server" href='/ItemList.aspx?itemid=<%# Eval("ItemID")%>' visible="false" style="color:#C01F2F;font-size:12px;">Other Options</a>
+                                    </div>
                                 </div>
                             </asp:Panel>
 
-                            <div class="collection-wrapper">
-                                <div class="container">
+                            <%-- ── With attributes ── --%>
+                            <asp:Panel ID="pnlAttribute" runat="server" Visible="false">
 
-                                    <div class="row">
-                                        <div class="col-lg-1 col-sm-2 col-xs-12" style="display:none">
-                                            <div class="row">
-                                                <div class="col-12 p-0">
-                                                    <div class="slider-right-nav">
-                                                        <div><asp:Image ID="imgItem" runat="server" alt="" class="img-fluid blur-up lazyload"/></div>
-                                                    </div>
+                                <%-- No-group: dropdown per attribute + single qty --%>
+                                <asp:Panel ID="pnlNoGroup" runat="server" Visible="false">
+                                    <div class="pd-nogroup-attr">
+                                        <asp:Repeater ID="rptNoGroupAttributes" runat="server" DataMember="AttributeID" OnItemDataBound="rptAttributes_ItemDataBound">
+                                            <ItemTemplate>
+                                                <div class="form-group mb-3">
+                                                    <label><%# Eval("AttributeName")%></label>
+                                                    <asp:DropDownList ID="ddlAttributeValue" runat="server" OnSelectedIndexChanged="ddlAttributeValue_SelectedIndexChanged" AutoPostBack="true" CssClass="form-control form-select-sm form-select"></asp:DropDownList>
+                                                    <asp:HiddenField ID="hfAttributeID" runat="server" Value='<%# Eval("AttributeID")%>' />
                                                 </div>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                        <div class="pd-attr-label">Quantity</div>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="pd-qty-control">
+                                                <button type="button" class="pd-qty-btn pd-qty-minus">&minus;</button>
+                                                <asp:TextBox ID="txtNoGroupAttributeQuantity" runat="server" type="number" CssClass="pd-qty-display" min="0"></asp:TextBox>
+                                                <button type="button" class="pd-qty-btn pd-qty-plus">+</button>
                                             </div>
                                         </div>
-                                        <div class="col-lg-5 col-sm-10 col-xs-12 order-up">
-                                            <div class="product-right-slick">
-                                                <div><asp:Image ID="imgItem2" runat="server" alt="" class="img-fluid blur-up lazyload image_zoom_cls-0" Width="100%"/></div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 rtl-text">
-                                            <div class="product-right">
-                                                <div class="product-count" style="display:none;">
-                                                    <ul>
-                                                        <li>
-                                                            <img src="../assets/images/fire.gif" class="img-fluid" alt="image">
-                                                            <span class="p-counter">37</span>
-                                                            <span class="lang">orders in last 24 hours</span>
-                                                        </li>
-                                                        <li>
-                                                            <img src="../assets/images/person.gif" class="img-fluid user_img" alt="image">
-                                                            <span class="p-counter">44</span>
-                                                            <span class="lang">active view this</span>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <h2><span id="ItemName"><asp:Label ID="lblHeader" runat="server" Text=""></asp:Label></span></h2>
-                                                <h4>Item#: <span id="ItemNumber" style="color:black;"><asp:Literal ID="litItemNumber" runat="server" Text=""></asp:Literal></span></h4>
-                                                <h4><asp:Literal ID="litSalesDescription" runat="server"></asp:Literal></h4>
-
-                                                <asp:Panel ID="pnlSingleUnit" runat="server">
-                                                    For a single unit purchase, &nbsp;&nbsp;<asp:HyperLink ID="btnSingleUnit" runat="server">Click Here</asp:HyperLink>
-                                                </asp:Panel>
-
-                                                <div class="rating-section" style="display:none;">
-                                                    <div class="rating"><i class="fa fa-star"></i> <i class="fa fa-star"></i> <i
-                                                            class="fa fa-star"></i> <i class="fa fa-star"></i> <i class="fa fa-star"></i>
-                                                    </div>
-                                                    <h6>120 ratings</h6>
-                                                </div>
-                                                <div class="label-section" style="display:none;">
-                                                    <span class="badge badge-grey-color">#1 Best seller</span>
-                                                    <span class="label-text">in fashion</span>
-                                                </div>
-                                                <h3 class="price-detail" style="display:none;">$<asp:Literal ID="litBasePrice" runat="server"></asp:Literal> </h3>
-                                                <ul class="color-variant" style="display:none;">
-                                                    <li class="bg-light0 active"></li>
-                                                    <li class="bg-light1"></li>
-                                                    <li class="bg-light2"></li>
-                                                </ul>
-
-                                                
-                                                    <asp:PlaceHolder ID="phEmployee" runat="server" Visible="false">
-
-                                                        <asp:PlaceHolder ID="phEmployeeAccount" runat="server" Visible="false">
-                                                            <div class="col-md-12">
-                                                                <br />
-                                                                <h6 class="product-title">Store</h6>                                        
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-md-9">
-                                                                    <asp:DropDownList ID="ddlAccount" runat="server" Width="100%" DataValueField="AccountID" DataTextField="AccountName" CssClass="form-control form-select-sm form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlAccount_SelectedIndexChanged"></asp:DropDownList>
-                                                                    <asp:TextBox ID="txtAccount" runat="server" CssClass="form-control" Enabled="false"></asp:TextBox>
-                                                                    <asp:HiddenField ID="hfAccountID" runat="server" />
-                                                                </div>
-                                                                <div class="col-md-3">
-                                                                    <asp:LinkButton ID="btnAccountSearch" runat="server" OnClick="btnAccountSearch_Click" CssClass="btn btn-solid" >Change<%--<i class="ti-search" style="font-size:large"></i>--%></asp:LinkButton>
-    <%--                                                                <asp:LinkButton ID="btnAccountRemove" runat="server" OnClick="btnAccountRemove_Click" Enabled="false"><i class="ti-trash" style="font-size:large"></i></asp:LinkButton>--%>
-                                                                </div>
-                                                            </div>
-                                                        </asp:PlaceHolder>
-
-                                                        <div class="col-md-12">
-                                                            <br />
-                                                            <h6 class="product-title">Employee</h6>                                        
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <asp:DropDownList ID="ddlUserInfo" runat="server" Width="100%" DataValueField="UserInfoID" DataTextField="FullName" CssClass="form-control form-select-sm form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlUserInfo_SelectedIndexChanged"></asp:DropDownList>
-                                                        </div>
-                                                        <br />
-                                                    </asp:PlaceHolder>
-
-                                                <div id="selectSize" class="addeffect-section border-product">
-                                                    <h6 class="product-title size-text" style="display:none;">select size <span></span></h6>
-                                                    <div class="modal fade" id="sizemodal" tabindex="-1" role="dialog"
-                                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                        <div class="modal-dialog modal-dialog-centered" role="document">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title" id="exampleModalLabel"></h5>
-                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                        aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                                </div>
-                                                                <div class="modal-body" style="display:none;"><img src="../assets/images/size-chart.jpg" alt=""
-                                                                        class="img-fluid blur-up lazyload"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <asp:Repeater ID="rptItems" runat="server" DataMember="ItemID" OnItemDataBound="rptItems_ItemDataBound">
-                                                        <ItemTemplate>
-                                                            <asp:HiddenField ID="hfItemID" runat="server" Value='<%# Eval("Item.ItemID")%>'/>
-                                                            <asp:Panel ID="pnlNoAttribute" runat="server">
-                                                                <table>
-                                                                    <tr>
-                                                                        <td style="min-width:100px;">Quantity</td>
-                                                                        <td style="text-align:center;">
-                                                                            <div class="qty-box">
-                                                                                <div class="input-group">
-                                                                                    <asp:TextBox ID="txtQuantity" runat="server" Width="80px" type="number" CssClass="form-control input-number" min="0"></asp:TextBox>
-                                                                                </div>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td></td>
-                                                                        <td style="text-align:center;"><asp:Label ID="lblUnitPrice" runat="server"></asp:Label></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td></td>
-                                                                        <td style="text-align:center; font-size:11px;"><u><asp:Label ID="lblQuantityAvailable" runat="server"></asp:Label></u><br /><a id="aSuperceedingItem" runat="server" href='/ItemList.aspx?itemid=<%# Eval("ItemID")%>' visible="false">Other Options</a></td>
-                                                                    </tr>
-                                                                </table>
-                                                                <p></p>
-                                                            </asp:Panel>
-                                                            <asp:Panel ID="pnlAttribute" runat="server" Visible="false">
-                                                                <asp:Panel ID="pnlNoGroup" runat="server" Visible="false">
-                                                                    <table>
-                                                                        <asp:Repeater ID="rptNoGroupAttributes" runat="server" DataMember="AttributeID" OnItemDataBound="rptAttributes_ItemDataBound">
-                                                                            <ItemTemplate>
-                                                                                <tr>
-                                                                                    <td style="min-width:100px;"><%# Eval("AttributeName")%></td>
-                                                                                    <td><asp:DropDownList ID="ddlAttributeValue" runat="server" OnSelectedIndexChanged="ddlAttributeValue_SelectedIndexChanged" AutoPostBack="true"></asp:DropDownList><asp:HiddenField ID="hfAttributeID" runat="server" Value='<%# Eval("AttributeID")%>'/></td>
-                                                                                </tr>
-                                                                            </ItemTemplate>
-                                                                        </asp:Repeater>
-                                                                        <tr>
-                                                                            <td>Quantity</td>
-                                                                            <td style="text-align:center;">
-                                                                                <div class="qty-box">
-                                                                                    <div class="input-group">
-                                                                                        <asp:TextBox ID="txtNoGroupAttributeQuantity" runat="server" Width="80px" type="number" CssClass="form-control input-number" min="0"></asp:TextBox>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td></td>
-                                                                            <td style="text-align:center; font-size:10px;"><asp:Label ID="lblNoGroupAttributeUnitPrice" runat="server"></asp:Label></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td></td>
-                                                                            <td style="text-align:center; font-size:10px;"><u><asp:Label ID="lblNoGroupAttributeQuantityAvailable" runat="server"></asp:Label></u><br /><a id="aNoGroupAttributeSuperceedingItem" runat="server" href='/ItemList.aspx?itemid=<%# Eval("ItemID")%>' visible="false">Other Options</a></td>
-                                                                        </tr>
-                                                                    </table>
-                                                                </asp:Panel>                                                                        
-                                                                <asp:Panel ID="pnlGroup" runat="server" Visible="false">
-                                                                    <asp:Repeater ID="rptGroupByAttribute" runat="server" DataMember="AttributeValueID" OnItemDataBound="rptGroupByAttribute_ItemDataBound" OnItemCommand="rptGroupByAttribute_ItemCommand">
-                                                                        <HeaderTemplate>
-                                                                            <h6 class="product-title">select color</h6>
-                                                                            <div class="size-box">
-                                                                                <ul>
-                                                                        </HeaderTemplate>
-                                                                        <ItemTemplate>
-                                                                            <li id="liSelected" runat="server"><asp:LinkButton ID="lbnAttributeValue" runat="server" CommandArgument='<%#Eval("AttributeValueID")%>' CommandName="Update"></asp:LinkButton></li>
-                                                                            <%--<li><a href="javascript:void(0)"> <%#Eval("Abbreviation").ToString()[0]%></a></li>--%>
-                                                                        </ItemTemplate>
-                                                                        <FooterTemplate>
-                                                                                </ul>
-                                                                            </div>
-                                                                            <br />
-                                                                        </FooterTemplate>
-                                                                    </asp:Repeater>
-
-                                                                    <asp:Panel ID="pnlLengthWidthAttribute" runat="server" Visible="false">
-                                                                        <div class="form-row row">
-                                                                            <div class="col-12" style="text-align:left;">
-                                                                                <label>Size:</label>
-                                                                                <asp:DropDownList ID="ddlLengthWidthAttribute" runat="server" CssClass="form-control form-select-sm form-select" DataValueField="AttributeValueID" DataTextField="Value" OnSelectedIndexChanged="ddlLengthWidthAttribute_SelectedIndexChanged" Width="50%" AutoPostBack="true"></asp:DropDownList>    
-                                                                                &nbsp;&nbsp;<asp:Label ID="lblLengthWidthAttributeUnitPrice" runat="server"></asp:Label><br />
-                                                                                &nbsp;&nbsp;<u style="font-size:10px;"><asp:Label ID="lblLengthWidthAttributeQuantityAvailable" runat="server"></asp:Label></u><br />
-                                                                                &nbsp;&nbsp;<asp:LinkButton ID="lbnLengthWidthAttributeSuperceedingItem" runat="server" visible="false" CausesValidation="false">Other Options</asp:LinkButton>
-                                                                                <br />
-                                                                            </div>
-                                                                            <div class="col-12" style="text-align:left;">
-                                                                                <label>Quantity:</label>
-                                                                                <asp:TextBox ID="txtLengthWidthAttributeQuantity" runat="server" Width="80px" type="number" CssClass="form-control input-number" min="0"></asp:TextBox>
-                                                                                <br />
-
-                                                                            </div>
-                                                                        </div>
-                                                                    </asp:Panel>
-
-                                                                    <asp:Panel ID="pnlGroupSingleAttribute" runat="server" Visible="false">
-                                                                        <%--<h6 class="product-title">select size</h6>--%>
-
-                                                                        <asp:Repeater ID="rptGroupSingleAttributeValue" runat="server" OnItemDataBound="rptGroupSingleAttributeValue_ItemDataBound">
-                                                                            <HeaderTemplate>
-                                                                                <h6 class="product-title" id="hHeader" runat="server">select size</h6>
-                                                                            </HeaderTemplate>
-                                                                            <ItemTemplate>
-                                                                                <div class="row">
-                                                                                    <%--<div class="col-2" style="margin-top:100px; vertical-align:top;">
-                                                                                        <%# Eval("Value")%>
-                                                                                    </div>--%>
-                                                                                    <div class="col-12" style="text-align:center;">
-                                                                                        <div class="row">
-                                                                                            <asp:HiddenField ID="hfAttributeValueID" runat="server" Value='<%# Eval("AttributeValueID")%>'/>
-                                                                                            <asp:GridView ID="gvGroupAttribute" runat="server" AutoGenerateColumns="false" CssClass="table cart-table order-table" HeaderStyle-CssClass="table-head" GridLines="None"  Width="100%" CellSpacing="0" CellPadding="0" Visible="false">
-                                                                                                <Columns>
-<%--                                                                                                    <asp:TemplateField HeaderText="Color">
-                                                                                                        <ItemTemplate>
-                                                                                                            <%# SelectedGroupAttributeValue.Value %>
-                                                                                                        </ItemTemplate>
-                                                                                                    </asp:TemplateField>--%>
-                                                                                                    <asp:TemplateField HeaderText="Size">
-                                                                                                        <ItemTemplate>
-                                                                                                            <%# Eval("Value")%>
-                                                                                                            <asp:HiddenField ID="hfListAttributeValueID" runat="server" Value='<%# Eval("AttributeValueID")%>'/>
-                                                                                                        </ItemTemplate>
-                                                                                                    </asp:TemplateField>
-                                                                                                    <asp:TemplateField HeaderText="Stock">
-                                                                                                        <ItemTemplate>
-                                                                                                            <u style="font-size:10px;"><asp:Label ID="lblGroupAttributeQuantityAvailable" runat="server"></asp:Label></u><br /><asp:LinkButton ID="lbnGroupAttributeSuperceedingItem" runat="server" visible="false" CausesValidation="false">Other Options</asp:LinkButton><a id="aGroupAttributeSuperceedingItem" runat="server" visible="false">Other Options</a>
-                                                                                                        </ItemTemplate>
-                                                                                                    </asp:TemplateField>
-                                                                                                    <asp:TemplateField HeaderText="Price">
-                                                                                                        <ItemTemplate>
-                                                                                                            <asp:Label ID="lblGroupAttributeUnitPrice" runat="server"></asp:Label>
-                                                                                                        </ItemTemplate>
-                                                                                                    </asp:TemplateField>
-                                                                                                    <asp:TemplateField HeaderText="Quantity">
-                                                                                                        <ItemTemplate>
-                                                                                                            <div class="qty-box">
-                                                                                                                <div class="input-group">
-                                                                                                                    <asp:TextBox ID="txtGroupAttributeQuantity" runat="server" Width="80px" type="number" CssClass="form-control input-number" min="0"></asp:TextBox>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                        </ItemTemplate>
-                                                                                                    </asp:TemplateField>
-                                                                                                </Columns>
-                                                                                            </asp:GridView>
-                                                                                            <asp:Repeater ID="rptGroupAttribute" runat="server" OnItemCommand="rptGroupAttribute_ItemCommand" Visible="false">
-                                                                                                <ItemTemplate>
-                                                                                                    <div class="col-2" style="text-align:center;">
-                                                                                                        <%# Eval("Value")%>
-                                                                                                        <asp:HiddenField ID="hfListAttributeValueID" runat="server" Value='<%# Eval("AttributeValueID")%>'/>
-                                                                                                        <div class="qty-box">
-                                                                                                            <div class="input-group">
-                                                                                                                <asp:TextBox ID="txtGroupAttributeQuantity" runat="server" Width="80px" type="number" CssClass="form-control input-number" min="0"></asp:TextBox>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                        <asp:Label ID="lblGroupAttributeUnitPrice" runat="server"></asp:Label><br />
-                                                                                                        <u style="font-size:10px;"><asp:Label ID="lblGroupAttributeQuantityAvailable" runat="server"></asp:Label></u><br /><asp:LinkButton ID="lbnGroupAttributeSuperceedingItem" runat="server" visible="false" CausesValidation="false">Other Options</asp:LinkButton><a id="aGroupAttributeSuperceedingItem" runat="server" visible="false">Other Options</a>
-                                                                                                        <br /><br />
-                                                                                                    </div>
-                                                                                                </ItemTemplate>
-                                                                                            </asp:Repeater>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </ItemTemplate>
-                                                                        </asp:Repeater>              
-                                                                    </asp:Panel>
-                                                                </asp:Panel>                                                                            
-                                                            </asp:Panel> 
-                                                        </ItemTemplate>
-                                                    </asp:Repeater>
-
-                                                    <%--<div class="size-box" style="display:none;">
-                                                        <ul>
-                                                            <li><a href="javascript:void(0)">s</a></li>
-                                                            <li><a href="javascript:void(0)">m</a></li>
-                                                            <li><a href="javascript:void(0)">l</a></li>
-                                                            <li><a href="javascript:void(0)">xl</a></li>
-                                                        </ul>
-                                                    </div>--%>
-                                                    <h6 class="product-title" style="display:none;">quantity</h6>
-                                                    <div class="qty-box" style="display:none;">
-                                                        <div class="input-group"><span class="input-group-prepend"><button type="button"
-                                                                    class="btn quantity-left-minus" data-type="minus" data-field=""><i
-                                                                        class="ti-angle-left"></i></button> </span>
-                                                            <input type="text" name="quantity" class="form-control input-number" value="1">
-                                                            <span class="input-group-prepend"><button type="button"
-                                                                    class="btn quantity-right-plus" data-type="plus" data-field=""><i
-                                                                        class="ti-angle-right"></i></button></span>
-                                                        </div>
-                                                    </div>
-
-
-                                                    <asp:PlaceHolder ID="phCustomization" runat="server" Visible="false">
-                                                        <div class="col-md-12">
-                                                            <br />
-                                                            <h3>Customize This Item</h3>                                        
-                                                        </div>
-
-                                                        <asp:PlaceHolder ID="phPersonalization" runat="server">
-                                                            <asp:Repeater ID="rptItemPersonalization" runat="server" DataMember="ItemPersonalizationID" OnItemDataBound="rptItemPersonalization_ItemDataBound">
-                                                                <ItemTemplate>
-                                                                    <div class="row" style="margin:10px;">
-                                                                        <h4><asp:Label ID="lblLabel" runat="server" Text='<%# Eval("Name")%>' ForeColor="Black"></asp:Label>:</h4>
-                                                                        <asp:TextBox ID="txtValue" runat="server" Visible="true" CssClass="form-control"></asp:TextBox>
-                                                                        <h4><asp:Label ID="lblVerifyLabel" runat="server" Visible="false" ForeColor="Black"></asp:Label></h4>
-                                                                        <asp:TextBox ID="txtVerifyValue" runat="server" Visible="false" CssClass="form-control"></asp:TextBox>
-                                                                        <asp:DropDownList ID="ddlValueList" runat="server" DataTextField="Value" DataValueField="Value" Visible="false" CssClass="form-control form-select-sm form-select" Style="margin-bottom:5px;" OnSelectedIndexChanged="ddlValueList_SelectedIndexChanged" AutoPostBack="true"></asp:DropDownList>
-                                                                        <asp:CheckBox ID="chkBlank" runat="server" Text="&nbsp;&nbsp;&nbsp;No Embroidery" CssClass="form-control" BorderStyle="None" AutoPostBack="true" OnCheckedChanged="chkBlank_CheckedChanged" />
-
-                                                                        <asp:DropDownList ID="ddlTextOption" runat="server" DataTextField="Label" DataValueField="Value" Visible="false" CssClass="form-control form-select-sm form-select" Style="margin-bottom:5px;" OnSelectedIndexChanged="ddlTextOption_SelectedIndexChanged" AutoPostBack="true"></asp:DropDownList>
-                                                                        <asp:TextBox ID="txtTextOption" runat="server" Visible="false" CssClass="form-control"></asp:TextBox>
-
-                                                                        <asp:HiddenField ID="hfItemPersonalizationID" runat="server" Value='<%# Eval("ItemPersonalizationID")%>' />                                                                                                                                                                                        <br />
-                                                                    </div>
-                                                                </ItemTemplate>
-                                                            </asp:Repeater>
-
-                                                            <asp:Panel ID="pnlPersonalizationBasePrice" runat="server" Visible="false">
-                                                                <div class="row" style="margin:10px;  margin-bottom:30px;">
-                                                                    <h4><asp:Label ID="lblPersonalizationBasePrice" runat="server" ForeColor="Black" Text="Personalization Base Price"></asp:Label></h4>
-                                                                    <asp:TextBox ID="txtPersonalizationBasePrice" runat="server" CssClass="form-control" Enabled="false"></asp:TextBox>
-                                                                </div>
-                                                            </asp:Panel>
-
-                                                        </asp:PlaceHolder>
-
-                                                        <asp:PlaceHolder ID="phLogo" runat="server">
-                                                            <div class="col-md-12">
-                                            
-                    <%--                                            <asp:DropDownList ID="ddlLogo" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlLogo_SelectedIndexChanged" Visible="false">
-                                                                    <asp:ListItem></asp:ListItem>
-                                                                    <asp:ListItem Value="Logo4">Circle Logo</asp:ListItem>
-                                                                    <asp:ListItem Value="Logo5">CMYK Logo</asp:ListItem>
-                                                                </asp:DropDownList>--%>
-                                         
-
-                                                                <div class="row" style="margin:10px;">
-                                                                    <h4><label>Please select a logo: </label></h4>
-                    <%--                                                <asp:DropDownList ID="ddlItemSelectableLogo" runat="server" AutoPostBack="true" DataValueField="ItemSelectableLogoID" DataTextField="Description" OnSelectedIndexChanged="ddlItemSelectableLogo_SelectedIndexChanged" CssClass="form-control"></asp:DropDownList>--%>
-                                                                    <asp:HiddenField ID="hfSelectedLogo" runat="server" />
-                                                                    <asp:Panel ID="pnlSelectableLogoImage" runat="server" BackColor="LightGray">
-                                                                        <ul>
-                                                                            <asp:Repeater ID="rptSelectableLogo" runat="server" DataMember="ItemSelectableLogoID" OnItemDataBound="rptSelectableLogo_ItemDataBound" OnItemCommand="rptSelectableLogo_ItemCommand">
-                                                                                <ItemTemplate>
-                                                                                    <li id="liSelected" runat="server"><asp:LinkButton ID="lbnSelectableLogo" runat="server" CommandArgument='<%#Eval("ItemSelectableLogoID")%>' CommandName="Update"><asp:Image ID="imgLogo" runat="server" /></asp:LinkButton></li>
-                                                                                </ItemTemplate>
-                                                                            </asp:Repeater>
-                                                                        </ul>
-                                                                    </asp:Panel>
-                                                                    <br />
-                                                                    <asp:CheckBox ID="chkNoLogo" runat="server" Text="&nbsp;&nbsp;&nbsp;No Logo" CssClass="form-control" BorderStyle="None" AutoPostBack="true" OnCheckedChanged="chkNoLogo_CheckedChanged" />
-                                                                </div>
-
-                                                                <asp:Panel ID="pnlSelectableLogoYear" runat="server" Visible="false">
-                                                                    <div class="row" style="margin:10px;">
-                                                                        <h4><asp:Label ID="lblSelectableLogoYear" runat="server" ForeColor="Black" Text="Year"></asp:Label></h4>
-                                                                        <asp:DropDownList ID="ddlSelectableLogoYear" runat="server" CssClass="form-control form-select-sm form-select" Style="margin-bottom:5px;"></asp:DropDownList>
-                                                                    </div>
-                                                                </asp:Panel>
-                                                                
-                                                                <asp:Panel ID="pnlSelectableBasePrice" runat="server" Visible="false">
-                                                                    <div class="row" style="margin:10px;">
-                                                                        <h4><asp:Label ID="lblSelectableBasePrice" runat="server" ForeColor="Black" Text="Logo Base Price"></asp:Label></h4>
-                                                                        <asp:TextBox ID="txtSelectableBasePrice" runat="server" CssClass="form-control" Enabled="false"></asp:TextBox>
-                                                                    </div>
-                                                                </asp:Panel>
-
-
-                                                            </div>
-                                                            <div class="col-md-12" style="display:none;">
-                                                                <h3>Upload Your Own Logo</h3>
-                                                                <label>Logo File</label>
-                                                                <asp:FileUpload ID="filLogo" runat="server" />
-                    <%--                                            <asp:Button ID="btnGenerate" runat="server" Text="Upload Logo" CssClass="btn btn-sm btn-solid" OnClick="btnGenerate_Click" />
-                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator5" runat="server" ControlToValidate="filLogo" Display="Dynamic" ErrorMessage="*" ForeColor="Red"></asp:RequiredFieldValidator>
-                                                                <br />--%>
-                                                            </div>
-                                                            <div class="col-md-12" style="display:none;">
-                                                                <label>Logo File</label>
-                                                                <asp:Image ID="imgUploadedLogo" runat="server" Width="100px" Visible="false" /><br />
-                                                            </div>
-
-                                                                <%--<div class="col-md-12" style="display:none;">
-                                                                    <p></p>
-                                                                    <asp:Image ID="imgResult" runat="server" Width="400px" />
-                                                                    <p></p>
-                                                                    <p></p>
-                                                                </div>
-                                                                <div class="col-md-2" style="display:none;">
-                                                                    <label>Position</label>
-                                                                </div>
-                                                                <div class="col-md-10" style="display:none;">
-                                                                    <label>Position of the logo: </label>
-                                                                    <asp:DropDownList ID="ddlPosition" runat="server" AutoPostBack="true" CausesValidation="false" OnSelectedIndexChanged="ddlPosition_SelectedIndexChanged">
-                                                                        <asp:ListItem Value="left-chest">Right Chest</asp:ListItem>
-                                                                        <asp:ListItem Value="right-chest" Selected="True">Left Chest</asp:ListItem>
-                                                                        <asp:ListItem Value="back">Back Center</asp:ListItem>
-                                                                        <asp:ListItem Value="left-waist">Right Waist</asp:ListItem>
-                                                                        <asp:ListItem Value="right-waist">Left Waist</asp:ListItem>
-                                                                    </asp:DropDownList>
-                                                                </div>
-                                                                <div class="col-md-10" style="display:none;">
-                                                                    <br />
-                                                                    <label>Full Name: </label>
-                                                                        <asp:TextBox ID="txtCustomDesignName" runat="server" Width="200px"></asp:TextBox>
-                                                                    </div>
-                                                                <div class="col-md-2" style="display:none;">
-                                                                    <label>Ratio</label>
-                                                                </div>
-                                                                <div class="col-md-10" style="display:none;">
-                                                                    <asp:Button ID="btnRatioMinus" runat="server" CausesValidation="false" Text="-" OnClick="btnRatio_Click" CommandArgument="Minus" />
-                                                                        <asp:DropDownList ID="ddlRatio" runat="server" AutoPostBack="true" CausesValidation="false" OnSelectedIndexChanged="ddlRatio_SelectedIndexChanged">
-                                                                        <asp:ListItem Value="0.1">10%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.2">20%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.3">30%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.4">40%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.5">50%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.6" Selected="True">60%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.7">70%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.8">80%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.9">90%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.0">100%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.1">110%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.2">120%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.3">130%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.4">140%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.5">150%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.6">160%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.7">170%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.8">180%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.9">190%</asp:ListItem>
-                                                                        <asp:ListItem Value="2.0">200%</asp:ListItem>
-                                                                    </asp:DropDownList>
-                                                                    <asp:Button ID="btnRatioPlus" runat="server" CausesValidation="false" Text="+" OnClick="btnRatio_Click" CommandArgument="Plus" />
-                                                                </div>
-                                                                <div class="col-md-2" style="display:none;">
-                                                                    <label>Left Margin</label>
-                                                                </div>
-                                                                <div class="col-md-10" style="display:none;">
-                                                                    <asp:Button ID="btnLeftMarginMinus" runat="server" CausesValidation="false" Text="-" OnClick="btnLeftMargin_Click" CommandArgument="Minus" />
-                                                                        <asp:DropDownList ID="ddlLeftMargin" runat="server" AutoPostBack="true" CausesValidation="false" OnSelectedIndexChanged="ddlLeftMargin_SelectedIndexChanged">
-                                                                        <asp:ListItem Value="1.9">10%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.8">20%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.7">30%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.6">40%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.5">50%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.4">60%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.3">70%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.2">80%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.1">90%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.0" Selected="True">100%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.9">110%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.8">120%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.7">130%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.6">140%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.5">150%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.4">160%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.3">170%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.2">180%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.1">190%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.0">200%</asp:ListItem>
-                                                                    </asp:DropDownList>
-                                                                    <asp:Button ID="btnLeftMarginPlus" runat="server" CausesValidation="false" Text="+" OnClick="btnLeftMargin_Click" CommandArgument="Plus" />
-                                                                </div>
-                                                                <div class="col-md-2" style="display:none;">
-                                                                    <label>Top Margin</label>
-                                                                </div>
-                                                                <div class="col-md-10" style="display:none;">
-                                                                    <asp:Button ID="btnTopMarginMinus" runat="server" CausesValidation="false" Text="-" OnClick="btnTopMargin_Click" CommandArgument="Minus" />
-                                                                        <asp:DropDownList ID="ddlTopMargin" runat="server" AutoPostBack="true" CausesValidation="false" OnSelectedIndexChanged="ddlTopMargin_SelectedIndexChanged">
-                                                                        <asp:ListItem Value="0.1">10%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.2">20%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.3">30%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.4">40%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.5">50%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.6">60%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.7">70%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.8">80%</asp:ListItem>
-                                                                        <asp:ListItem Value="0.9">90%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.0" Selected="True">100%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.1">110%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.2">120%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.3">130%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.4">140%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.5">150%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.6">160%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.7">170%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.8">180%</asp:ListItem>
-                                                                        <asp:ListItem Value="1.9">190%</asp:ListItem>
-                                                                        <asp:ListItem Value="2.0">200%</asp:ListItem>
-                                                                    </asp:DropDownList>
-                                                                    <asp:Button ID="btnTopMarginPlus" runat="server" CausesValidation="false" Text="+" OnClick="btnTopMargin_Click" CommandArgument="Plus" />
-                                                                </div>
-                                                                <br />--%>
-                                                            </asp:PlaceHolder>
-                                                            
-                                                        </asp:PlaceHolder>
-                                                    <div class="product-buttons">
-                                                        <div class="row" style="margin:10px;">
-                                                            <div class="col-md-6" style="padding:10px">
-                                                                <asp:Button id="btnAddToCart" runat="server" Text="Add To Cart" CssClass="btn btn-solid hover-solid btn-animation" OnClick="btnAddToCart_Click" CausesValidation="false"/>
-                                                            </div>
-                                                            <div class="col-md-6" style="padding:10px">
-                                                                <asp:Button id="btnAddMore" runat="server" Text="Add More" CssClass="btn btn-solid hover-solid btn-animation" OnClick="btnAddMore_Click" CausesValidation="false" Visible="false"/>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div id="divDetailedDescription"><asp:Literal ID="litDetailedDescription" runat="server"></asp:Literal></div>
-                                                    <div id="divNonInventoryUnavailableMessage" runat="server" style="margin-top:10px" visible="false">
-                                                        <span style="font-family: Lato,sans-serif; font-size:12px; color:red;"><strong>
-PLEASE NOTE:
-<br />
-This is a custom-ordered item with a 10-12 day lead time, selecting expedited shipping will NOT expedite the lead time.
-This item cannot be returned or exchanged due to the custom decoration.
-We are unable to accept orders for items which are currently unavailable – if the size is greyed out, then we do not have stock.
-Please check back regularly as stock levels are updated daily.
-                                                        </strong></span>
-                                                    </div>
-
-                                                    <asp:Repeater id="rptProductDetail" runat="server">
-                                                        <ItemTemplate>
-                                                            <div class="border-product">
-                                                                <h6 class="product-title"><%# Eval("Attribute") %></h6>
-                                                                <ul class="shipping-info">
-                                                                    <%# Eval("ItemDetailValuesInHTML") %>
-                                                                </ul>
-                                                            </div>
-                                                        </ItemTemplate>
-                                                    </asp:Repeater>
-
-                                                    <div class="product-buttons">
-                                                        <div class="row" style="margin:10px;">
-                                                            <div class="col-md-3">
-                                                                <asp:Button id="btnSizeChart" runat="server" Text="Size Chart" CssClass="btn btn-solid hover-solid btn-animation" OnClick="btnSizeChart_Click" CausesValidation="false"/>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="pd-qty-info">
+                                            <asp:Label ID="lblNoGroupAttributeQuantityAvailable" runat="server"></asp:Label>
+                                            &nbsp;<a id="aNoGroupAttributeSuperceedingItem" runat="server" href='/ItemList.aspx?itemid=<%# Eval("ItemID")%>' visible="false" style="color:#C01F2F;font-size:12px;">Other Options</a>
                                         </div>
                                     </div>
-                                </div>
+                                </asp:Panel>
 
-                                <asp:HiddenField ID="hfSelectedGroupByAttributeValueID" runat="server" />
-                            </div>
+                                <%-- Grouped (Color + Size) --%>
+                                <asp:Panel ID="pnlGroup" runat="server" Visible="false">
 
-                        </div>
-                     </div>
-                </div>    
-
-
-                <asp:Panel ID="pnlRelatedItems" runat="server">            
-                    <div class="collection-product-wrapper" style="margin:8%;">
-                        <div class="row">
-                            <div class="col-12 product-related">
-                                <h2>related items</h2>
-                            </div>
-                        </div>
-                        <div class="product-wrapper-grid">
-                            <div class="row margin-res">
-
-                                <asp:Repeater ID="rptRelatedItem" runat="server" OnItemCommand="rptRelatedItem_ItemCommand" OnItemDataBound="rptRelatedItem_ItemDataBound">
-                                    <ItemTemplate>
-                                        <div class="col-xl-2 col-md-4 col-6">
-                                            <div class="product-box" >
-                                                <div class="img-wrapper" style="text-align:center; height:200px;">
-                                                    <div class="front">
-                                                        <a href="/ProductDetail.aspx?id=<%# Eval("Item.ItemID")%>&websitetabid=<%# mWebSiteTabID %>"><img src='<%# Eval("Item.DisplayImageURL")%>' class="img-fluid blur-up lazyload" alt="" ></a>
-                                                    </div>
+                                    <%-- Color swatches --%>
+                                    <asp:Repeater ID="rptGroupByAttribute" runat="server" DataMember="AttributeValueID" OnItemDataBound="rptGroupByAttribute_ItemDataBound" OnItemCommand="rptGroupByAttribute_ItemCommand">
+                                        <HeaderTemplate>
+                                            <div class="pd-color-section">
+                                                <div class="pd-attr-label">
+                                                    Color:&nbsp;<span class="pd-attr-value" id="spanSelectedColor"></span>
                                                 </div>
-                                                <div class="product-detail">
-                                                    <div style="text-align:left;">
-                                                        <div style="height:50px;display: flex;">
-                                                            <h4 style="align-self: flex-end;"><a href="/ProductDetail.aspx?id=<%# Eval("Item.ItemID")%>" style="font-size:16px;font-weight:normal;text-decoration:none;color:#777777"><%# Eval("Item.StoreDisplayName")%></a></h4>
-                                                        </div>
-                                                        <br />
-                                                        <h4><%# string.Format("{0:c}", Eval("Item.PriceRange")) %></h4>
-                                                        <h1><asp:Label ID="lblGroupAttributeUnitPrice" runat="server"></asp:Label></h1>
+                                                <ul class="pd-swatches">
+                                        </HeaderTemplate>
+                                        <ItemTemplate>
+                                            <li id="liSelected" runat="server">
+                                                <asp:LinkButton ID="lbnAttributeValue" runat="server" CommandArgument='<%#Eval("AttributeValueID")%>' CommandName="Update" CssClass="pd-swatch-btn"></asp:LinkButton>
+                                            </li>
+                                        </ItemTemplate>
+                                        <FooterTemplate>
+                                                </ul>
+                                            </div>
+                                        </FooterTemplate>
+                                    </asp:Repeater>
 
-            
-            <%--                                            <asp:Repeater ID="rptColors" runat="server">
-                                                            <ItemTemplate>
-                                                                    <ul">
-                                                                    <li class="color-item" style="background-color:#<%# Eval("BackgroundColor")%>; width:20px; height: 20px; margin-right: 8px;">
-                                                                    </ul>
-                                                            </ItemTemplate>
-                                                        </asp:Repeater>--%>
-
-                                                    </div>
-                                                </div>
+                                    <%-- Length/Width dropdown (when UseLengthAndWidth) --%>
+                                    <asp:Panel ID="pnlLengthWidthAttribute" runat="server" Visible="false">
+                                        <div class="pd-size-section pd-lw-section">
+                                            <div class="pd-attr-label">Size:</div>
+                                            <asp:DropDownList ID="ddlLengthWidthAttribute" runat="server" CssClass="form-control form-select-sm form-select" DataValueField="AttributeValueID" DataTextField="Value" OnSelectedIndexChanged="ddlLengthWidthAttribute_SelectedIndexChanged" Width="50%" AutoPostBack="true"></asp:DropDownList>
+                                            <div class="pd-qty-info mt-1">
+                                                <asp:Label ID="lblLengthWidthAttributeUnitPrice" runat="server" CssClass="pd-unit-price"></asp:Label>
+                                                &nbsp;<asp:Label ID="lblLengthWidthAttributeQuantityAvailable" runat="server"></asp:Label>
+                                                &nbsp;<asp:LinkButton ID="lbnLengthWidthAttributeSuperceedingItem" runat="server" visible="false" CausesValidation="false" style="color:#C01F2F;font-size:12px;">Other Options</asp:LinkButton>
                                             </div>
                                         </div>
+                                        <div class="pd-simple-qty">
+                                            <div class="pd-attr-label">Quantity</div>
+                                            <div class="pd-qty-control">
+                                                <button type="button" class="pd-qty-btn pd-qty-minus">&minus;</button>
+                                                <asp:TextBox ID="txtLengthWidthAttributeQuantity" runat="server" type="number" CssClass="pd-qty-display" min="0"></asp:TextBox>
+                                                <button type="button" class="pd-qty-btn pd-qty-plus">+</button>
+                                            </div>
+                                        </div>
+                                    </asp:Panel>
+
+                                    <%-- Single-group attribute (size buttons) --%>
+                                    <asp:Panel ID="pnlGroupSingleAttribute" runat="server" Visible="false">
+                                        <asp:Repeater ID="rptGroupSingleAttributeValue" runat="server" OnItemDataBound="rptGroupSingleAttributeValue_ItemDataBound">
+                                            <HeaderTemplate>
+                                                <div class="pd-size-section">
+                                                    <div class="pd-attr-label">
+                                                        <h6 id="hHeader" runat="server" style="margin:0;font-size:13px;font-weight:600;">Size</h6>
+                                                        <asp:Button ID="btnSizeChartInline" runat="server" Text="Size Guide" CssClass="pd-size-guide-link" OnClick="btnSizeChart_Click" CausesValidation="false" style="background:none;border:none;padding:0;font-size:12px;color:#C01F2F;text-decoration:underline;cursor:pointer;" Visible="false" />
+                                                    </div>
+                                                    <div class="pd-sizes sizes-container">
+                                            </HeaderTemplate>
+                                            <ItemTemplate>
+                                                <asp:HiddenField ID="hfAttributeValueID" runat="server" Value='<%# Eval("AttributeValueID")%>' />
+
+                                                <%-- Grid display mode --%>
+                                                <asp:Repeater ID="rptGroupAttribute" runat="server" OnItemCommand="rptGroupAttribute_ItemCommand" Visible="false">
+                                                    <ItemTemplate>
+                                                        <div class="size-btn-item">
+                                                            <asp:HiddenField ID="hfListAttributeValueID" runat="server" Value='<%# Eval("AttributeValueID")%>' />
+                                                            <button type="button" class="size-btn" onclick="return pdSelectSize(this);"><%# Eval("Value")%></button>
+                                                            <asp:TextBox ID="txtGroupAttributeQuantity" runat="server" type="number" CssClass="size-qty-input" min="0"></asp:TextBox>
+                                                            <asp:Label ID="lblGroupAttributeUnitPrice" runat="server" CssClass="size-price" style="display:none;"></asp:Label>
+                                                            <asp:Label ID="lblGroupAttributeQuantityAvailable" runat="server" CssClass="size-stock" style="display:none;"></asp:Label>
+                                                            <asp:LinkButton ID="lbnGroupAttributeSuperceedingItem" runat="server" visible="false" CausesValidation="false" style="display:none;">Other Options</asp:LinkButton>
+                                                            <a id="aGroupAttributeSuperceedingItem" runat="server" visible="false" style="display:none;">Other Options</a>
+                                                        </div>
+                                                    </ItemTemplate>
+                                                </asp:Repeater>
+
+                                                <%-- List display mode (GridView styled as size buttons) --%>
+                                                <asp:GridView ID="gvGroupAttribute" runat="server" AutoGenerateColumns="false" CssClass="size-grid-table" GridLines="None" CellSpacing="0" CellPadding="0" Visible="false" ShowHeader="false">
+                                                    <Columns>
+                                                        <asp:TemplateField>
+                                                            <ItemTemplate>
+                                                                <div class="size-btn-item">
+                                                                    <asp:HiddenField ID="hfListAttributeValueID" runat="server" Value='<%# Eval("AttributeValueID")%>' />
+                                                                    <button type="button" class="size-btn" onclick="return pdSelectSize(this);"><%# Eval("Value")%></button>
+                                                                    <asp:TextBox ID="txtGroupAttributeQuantity" runat="server" type="number" CssClass="size-qty-input" min="0"></asp:TextBox>
+                                                                    <asp:Label ID="lblGroupAttributeUnitPrice" runat="server" CssClass="size-price" style="display:none;"></asp:Label>
+                                                                    <asp:Label ID="lblGroupAttributeQuantityAvailable" runat="server" CssClass="size-stock" style="display:none;"></asp:Label>
+                                                                    <asp:LinkButton ID="lbnGroupAttributeSuperceedingItem" runat="server" visible="false" CausesValidation="false" style="display:none;">Other Options</asp:LinkButton>
+                                                                    <a id="aGroupAttributeSuperceedingItem" runat="server" visible="false" style="display:none;">Other Options</a>
+                                                                </div>
+                                                            </ItemTemplate>
+                                                        </asp:TemplateField>
+                                                    </Columns>
+                                                </asp:GridView>
+
+                                            </ItemTemplate>
+                                            <FooterTemplate>
+                                                    </div><%-- close pd-sizes --%>
+                                                </div><%-- close pd-size-section --%>
+
+                                                <%-- Shared quantity control shown after size is selected --%>
+                                                <div class="pd-qty-section shared-qty-section" style="display:none;">
+                                                    <div class="pd-attr-label">Quantity</div>
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <div class="pd-qty-control">
+                                                            <button type="button" class="pd-qty-btn shared-qty-minus">&minus;</button>
+                                                            <input type="number" class="pd-qty-display shared-qty-display" value="1" min="1" />
+                                                            <button type="button" class="pd-qty-btn shared-qty-plus">+</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="pd-qty-info selected-size-stock"></div>
+                                                </div>
+                                            </FooterTemplate>
+                                        </asp:Repeater>
+                                    </asp:Panel>
+
+                                </asp:Panel><%-- /pnlGroup --%>
+                            </asp:Panel><%-- /pnlAttribute --%>
+                        </ItemTemplate>
+                    </asp:Repeater>
+
+                    <%-- ══ Customization ══ --%>
+                    <asp:PlaceHolder ID="phCustomization" runat="server" Visible="false">
+                        <div class="pd-customization">
+                            <h5>Customize This Item</h5>
+
+                            <asp:PlaceHolder ID="phPersonalization" runat="server">
+                                <asp:Repeater ID="rptItemPersonalization" runat="server" DataMember="ItemPersonalizationID" OnItemDataBound="rptItemPersonalization_ItemDataBound">
+                                    <ItemTemplate>
+                                        <div class="form-group mb-3">
+                                            <label><asp:Label ID="lblLabel" runat="server" Text='<%# Eval("Name")%>' ForeColor="Black"></asp:Label></label>
+                                            <asp:TextBox ID="txtValue" runat="server" Visible="true" CssClass="form-control"></asp:TextBox>
+                                            <asp:Label ID="lblVerifyLabel" runat="server" Visible="false" ForeColor="Black" CssClass="form-label mt-2"></asp:Label>
+                                            <asp:TextBox ID="txtVerifyValue" runat="server" Visible="false" CssClass="form-control"></asp:TextBox>
+                                            <asp:DropDownList ID="ddlValueList" runat="server" DataTextField="Value" DataValueField="Value" Visible="false" CssClass="form-control form-select-sm form-select" Style="margin-bottom:5px;" OnSelectedIndexChanged="ddlValueList_SelectedIndexChanged" AutoPostBack="true"></asp:DropDownList>
+                                            <asp:CheckBox ID="chkBlank" runat="server" Text="&nbsp;&nbsp;&nbsp;No Embroidery" CssClass="form-check-input mt-2" BorderStyle="None" AutoPostBack="true" OnCheckedChanged="chkBlank_CheckedChanged" />
+                                            <asp:DropDownList ID="ddlTextOption" runat="server" DataTextField="Label" DataValueField="Value" Visible="false" CssClass="form-control form-select-sm form-select" Style="margin-bottom:5px;" OnSelectedIndexChanged="ddlTextOption_SelectedIndexChanged" AutoPostBack="true"></asp:DropDownList>
+                                            <asp:TextBox ID="txtTextOption" runat="server" Visible="false" CssClass="form-control mt-1"></asp:TextBox>
+                                            <asp:HiddenField ID="hfItemPersonalizationID" runat="server" Value='<%# Eval("ItemPersonalizationID")%>' />
+                                        </div>
                                     </ItemTemplate>
-                                </asp:Repeater>   
-                        
+                                </asp:Repeater>
+                                <asp:Panel ID="pnlPersonalizationBasePrice" runat="server" Visible="false">
+                                    <div class="form-group mb-3">
+                                        <label><asp:Label ID="lblPersonalizationBasePrice" runat="server" ForeColor="Black" Text="Personalization Base Price"></asp:Label></label>
+                                        <asp:TextBox ID="txtPersonalizationBasePrice" runat="server" CssClass="form-control" Enabled="false"></asp:TextBox>
+                                    </div>
+                                </asp:Panel>
+                            </asp:PlaceHolder>
+
+                            <asp:PlaceHolder ID="phLogo" runat="server">
+                                <div class="form-group mb-2">
+                                    <label>Please select a logo:</label>
+                                    <asp:HiddenField ID="hfSelectedLogo" runat="server" />
+                                    <asp:Panel ID="pnlSelectableLogoImage" runat="server" CssClass="mt-2">
+                                        <ul class="pd-logo-grid">
+                                            <asp:Repeater ID="rptSelectableLogo" runat="server" DataMember="ItemSelectableLogoID" OnItemDataBound="rptSelectableLogo_ItemDataBound" OnItemCommand="rptSelectableLogo_ItemCommand">
+                                                <ItemTemplate>
+                                                    <li id="liSelected" runat="server">
+                                                        <asp:LinkButton ID="lbnSelectableLogo" runat="server" CommandArgument='<%#Eval("ItemSelectableLogoID")%>' CommandName="Update">
+                                                            <asp:Image ID="imgLogo" runat="server" />
+                                                        </asp:LinkButton>
+                                                    </li>
+                                                </ItemTemplate>
+                                            </asp:Repeater>
+                                        </ul>
+                                    </asp:Panel>
+                                    <div class="mt-2">
+                                        <asp:CheckBox ID="chkNoLogo" runat="server" Text="&nbsp;&nbsp;&nbsp;No Logo" CssClass="form-check-input" BorderStyle="None" AutoPostBack="true" OnCheckedChanged="chkNoLogo_CheckedChanged" />
+                                    </div>
+                                </div>
+                                <asp:Panel ID="pnlSelectableLogoYear" runat="server" Visible="false">
+                                    <div class="form-group mb-2">
+                                        <label><asp:Label ID="lblSelectableLogoYear" runat="server" ForeColor="Black" Text="Year"></asp:Label></label>
+                                        <asp:DropDownList ID="ddlSelectableLogoYear" runat="server" CssClass="form-control form-select-sm form-select" Style="max-width:160px;"></asp:DropDownList>
+                                    </div>
+                                </asp:Panel>
+                                <asp:Panel ID="pnlSelectableBasePrice" runat="server" Visible="false">
+                                    <div class="form-group mb-2">
+                                        <label><asp:Label ID="lblSelectableBasePrice" runat="server" ForeColor="Black" Text="Logo Base Price"></asp:Label></label>
+                                        <asp:TextBox ID="txtSelectableBasePrice" runat="server" CssClass="form-control" Enabled="false" style="max-width:160px;"></asp:TextBox>
+                                    </div>
+                                </asp:Panel>
+                                <%-- Hidden file upload kept for code-behind compat --%>
+                                <div style="display:none;">
+                                    <asp:FileUpload ID="filLogo" runat="server" />
+                                    <asp:Image ID="imgUploadedLogo" runat="server" Width="100px" Visible="false" />
+                                </div>
+                            </asp:PlaceHolder>
+                        </div>
+                    </asp:PlaceHolder>
+
+                    <%-- ══ Action Buttons ══ --%>
+                    <div class="pd-actions">
+                        <asp:Button id="btnAddToCart" runat="server" Text="ADD TO CART" CssClass="btn-add-to-bag" OnClick="btnAddToCart_Click" CausesValidation="false" />
+                        <asp:Button id="btnBuyNow" runat="server" Text="BUY NOW" CssClass="btn-buy-now" OnClick="btnBuyNow_Click" CausesValidation="false" Visible="false" />
+                        <asp:Button id="btnAddMore" runat="server" Text="Add More" CssClass="btn-add-more" OnClick="btnAddMore_Click" CausesValidation="false" Visible="false" />
+                    </div>
+
+                    <%-- Size chart button (shown when item has chart) --%>
+                    <asp:Button id="btnSizeChart" runat="server" Text="Size Chart" CssClass="btn-size-chart" OnClick="btnSizeChart_Click" CausesValidation="false" style="margin-bottom:20px;" />
+
+                    <%-- ══ Accordion: Product Details + Shipping ══ --%>
+                    <div class="pd-accordion">
+
+                        <%-- Product Details entries from backend --%>
+                        <asp:Repeater id="rptProductDetail" runat="server">
+                            <ItemTemplate>
+                                <div class="pd-accordion-item">
+                                    <div class="pd-accordion-header" onclick="pdToggleAccordion(this)">
+                                        <span><%# Eval("Attribute") %></span>
+                                        <span class="pd-accordion-icon">&#8964;</span>
+                                    </div>
+                                    <div class="pd-accordion-body" style="display:none;">
+                                        <ul><%# Eval("ItemDetailValuesInHTML") %></ul>
+                                    </div>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
+
+                        <%-- Detailed description accordion --%>
+                        <div class="pd-accordion-item" id="divDetailedDescriptionAccordion" runat="server">
+                            <div class="pd-accordion-header" onclick="pdToggleAccordion(this)">
+                                <span>Product Details</span>
+                                <span class="pd-accordion-icon">&#8964;</span>
+                            </div>
+                            <div class="pd-accordion-body" style="display:none;">
+                                <div id="divDetailedDescription"><asp:Literal ID="litDetailedDescription" runat="server"></asp:Literal></div>
                             </div>
                         </div>
-                        <uc1:Pager runat="server" ID="ucPager" PagingMode="Redirect" PageSize="16" PagingRecordText="Items" />
+
+                        <%-- Shipping accordion --%>
+                        <div class="pd-accordion-item">
+                            <div class="pd-accordion-header" onclick="pdToggleAccordion(this)">
+                                <span>Shipping</span>
+                                <span class="pd-accordion-icon">&#8963;</span>
+                            </div>
+                            <div class="pd-accordion-body">
+                                <p>Shipping rates and delivery times are calculated at checkout. Expedited shipping is available but will not reduce production lead times for custom-decorated items.</p>
+                            </div>
+                        </div>
+
+                    </div><%-- /pd-accordion --%>
+
+                </div><%-- /pd-details-col --%>
+            </div><%-- /row --%>
+
+            <%-- ══ Related Items ══ --%>
+            <asp:Panel ID="pnlRelatedItems" runat="server" CssClass="pd-related">
+                <h2>RECOMMENDED FOR YOU</h2>
+                <div class="pd-related-carousel">
+                    <button type="button" class="related-arrow related-prev" onclick="pdRelatedNav(-1)" style="display:none;">&#8249;</button>
+                    <div class="related-track">
+                        <div class="row related-items-row justify-content-center" id="relatedItemsRow">
+                            <asp:Repeater ID="rptRelatedItem" runat="server" OnItemCommand="rptRelatedItem_ItemCommand" OnItemDataBound="rptRelatedItem_ItemDataBound">
+                                <ItemTemplate>
+                                    <div class="col-6 col-md-2 mb-4 pd-related-item">
+                                        <div class="img-wrapper">
+                                            <a href="/ProductDetail.aspx?id=<%# Eval("Item.ItemID")%>&websitetabid=<%# mWebSiteTabID %>">
+                                                <img src='<%# Eval("Item.DisplayImageURL")%>' class="img-fluid" alt="" />
+                                            </a>
+                                        </div>
+                                        <h4><a href="/ProductDetail.aspx?id=<%# Eval("Item.ItemID")%>"><%# Eval("Item.StoreDisplayName")%></a></h4>
+                                        <p class="pd-related-price"><%# Eval("Item.PriceRange") %></p>
+                                        <div class="product-card-colors">
+                                            <asp:Literal ID="litColorSwatches" runat="server"></asp:Literal>
+                                        </div>
+                                    </div>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                        </div>
                     </div>
-                </asp:Panel>
+                    <button type="button" class="related-arrow related-next" onclick="pdRelatedNav(1)" style="display:none;">&#8250;</button>
+                </div>
+            </asp:Panel>
 
 
-            </div>
-        </div>
-
-        
-
+        </div><%-- /container --%>
     </section>
 
+    <asp:HiddenField ID="hfSelectedGroupByAttributeValueID" runat="server" />
 
-    
-
- 
     <script>
-        window.dataLayer = window.dataLayer || [];
+        // ── Accordion ──────────────────────────────────────────────
+        function pdToggleAccordion(header) {
+            var body = header.nextElementSibling;
+            var icon = header.querySelector('.pd-accordion-icon');
+            var open = body.style.display !== 'none';
+            body.style.display = open ? 'none' : 'block';
+            icon.innerHTML = open ? '&#8964;' : '&#8963;';
+        }
 
-        itemName = (function () {
-            function capitalizeWords(str) {
-                return str.split(' ').map(function (word) {
-                    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-                }).join(' ');
-            }
-            var text = document.getElementById('ItemName').innerText.trim();
-            // Capitalize the first letter of each word
-            return capitalizeWords(text);
-        })(),
-            dataLayer.push({
-                event: 'view_item',
-                ecommerce: {
-                    items: {
-                        item_id: document.getElementById('ItemNumber').innerText,
-                        item_name: itemName,
+        // Open Shipping accordion by default (matches reference image)
+        document.addEventListener('DOMContentLoaded', function () {
+            var shippingHeaders = document.querySelectorAll('.pd-accordion-header');
+            shippingHeaders.forEach(function (h) {
+                if (h.querySelector('span:first-child').textContent.trim() === 'Shipping') {
+                    pdToggleAccordion(h);
+                }
+            });
+
+            // ── Qty +/- for simple (no-attribute) items ────────────
+            document.querySelectorAll('.pd-qty-minus').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var inp = this.nextElementSibling;
+                    var v = parseInt(inp.value) || 0;
+                    if (v > 0) inp.value = v - 1;
+                });
+            });
+            document.querySelectorAll('.pd-qty-plus').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var inp = this.previousElementSibling;
+                    var v = parseInt(inp.value) || 0;
+                    inp.value = v + 1;
+                });
+            });
+
+            // ── Color swatch click → re-check buttons ──────────────
+            document.querySelectorAll('.pd-swatch-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    document.querySelectorAll('.pd-swatch-btn').forEach(function (b) { b.classList.remove('pd-swatch-selected'); });
+                    this.classList.add('pd-swatch-selected');
+                    pdCheckEnableButtons();
+                });
+            });
+
+            // ── Mark out-of-stock size buttons ─────────────────────
+            document.querySelectorAll('.size-btn-item').forEach(function (item) {
+                var input = item.querySelector('.size-qty-input');
+                var btn = item.querySelector('.size-btn');
+                if (input && btn && input.disabled) {
+                    btn.classList.add('out-of-stock');
+                    btn.disabled = true;
+                }
+            });
+
+            // ── Shared qty +/- ─────────────────────────────────────
+            document.querySelectorAll('.shared-qty-minus').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var display = this.parentElement.querySelector('.shared-qty-display');
+                    var v = parseInt(display.value) || 1;
+                    if (v > 1) {
+                        display.value = v - 1;
+                        pdSyncSelectedQty(btn, v - 1);
                     }
-                }
+                });
             });
-        document.getElementById('cphBody_btnAddToCart').addEventListener('click', function () {
-            var inputs = document.querySelectorAll('.form-control.input-number');
-            var totalQuantity = 0;
-            inputs.forEach(function (input) {
-                var quantity = parseInt(input.value) || 0;
-                totalQuantity += quantity;
-            })
-            dataLayer.push({
-                event: 'add_to_cart',
-                ecommerce: {
-                    item_id: document.getElementById('ItemNumber').innerText,
-                    item_name: itemName,
-                    quantity: totalQuantity
-                }
+            document.querySelectorAll('.shared-qty-plus').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var display = this.parentElement.querySelector('.shared-qty-display');
+                    var v = parseInt(display.value) || 1;
+                    display.value = v + 1;
+                    pdSyncSelectedQty(btn, v + 1);
+                });
             });
+            document.querySelectorAll('.shared-qty-display').forEach(function (inp) {
+                inp.addEventListener('change', function () {
+                    pdSyncSelectedQty(inp, parseInt(inp.value) || 1);
+                });
+            });
+
+            // ── Thumbnail strip (only if multiple images) ───────────
+            var mainImg = document.querySelector('.pd-main-img');
+            var strip = document.getElementById('divThumbnails');
+            var pdPrev = document.querySelector('.pd-img-prev');
+            var pdNext = document.querySelector('.pd-img-next');
+            if (mainImg && mainImg.src && strip) {
+                // Currently only one real image — show single thumb, hide nav
+                var thumb = document.createElement('div');
+                thumb.className = 'pd-thumb active';
+                var tImg = document.createElement('img');
+                tImg.src = mainImg.src;
+                tImg.alt = '';
+                thumb.appendChild(tImg);
+                strip.appendChild(thumb);
+                // Hide nav arrows since there's only one image
+                if (pdPrev) pdPrev.style.display = 'none';
+                if (pdNext) pdNext.style.display = 'none';
+            }
+
+            // ── Button enable/disable based on required selections ──
+            pdCheckEnableButtons();
+
+            // ── Category header: extract last segment as title, format breadcrumb ──
+            var bcLit = document.querySelector('#divCategoryBreadcrumb');
+            if (bcLit) {
+                var raw = bcLit.innerText || bcLit.textContent || '';
+                raw = raw.replace(/ &gt; /g, ' > ');
+                var segments = raw.split('>').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 0; });
+                if (segments.length > 0) {
+                    var titleEl = document.getElementById('divCategoryTitle');
+                    if (titleEl) titleEl.textContent = segments[segments.length - 1].toUpperCase();
+                }
+                bcLit.innerHTML = bcLit.innerHTML.replace(/ &gt; /g, ' / ').replace(/ > /g, ' / ');
+            }
+
+            // ── Related items carousel ──────────────────────────────
+            var relatedOffset = 0;
+            var relatedPageSize = 5;
+            function pdRelatedRender() {
+                var items = document.querySelectorAll('#relatedItemsRow .pd-related-item');
+                if (!items.length) return;
+                items.forEach(function (el, i) {
+                    el.style.display = (i >= relatedOffset && i < relatedOffset + relatedPageSize) ? '' : 'none';
+                });
+                var prevBtn = document.querySelector('.related-prev');
+                var nextBtn = document.querySelector('.related-next');
+                if (prevBtn) prevBtn.style.display = relatedOffset > 0 ? '' : 'none';
+                if (nextBtn) nextBtn.style.display = (relatedOffset + relatedPageSize < items.length) ? '' : 'none';
+            }
+            window.pdRelatedNav = function(dir) {
+                var items = document.querySelectorAll('#relatedItemsRow .pd-related-item');
+                relatedOffset = Math.max(0, Math.min(relatedOffset + dir * relatedPageSize, items.length - relatedPageSize));
+                pdRelatedRender();
+            };
+            pdRelatedRender();
+
+            // ── Google Analytics data layer ─────────────────────────
+            window.dataLayer = window.dataLayer || [];
+            var itemNameEl = document.getElementById('ItemName');
+            var itemNumberEl = document.getElementById('ItemNumber');
+            if (itemNameEl && itemNumberEl) {
+                var rawName = itemNameEl.innerText.trim();
+                var itemName = rawName.split(' ').map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join(' ');
+                dataLayer.push({ event: 'view_item', ecommerce: { items: { item_id: itemNumberEl.innerText, item_name: itemName } } });
+
+                var addBtn = document.getElementById('cphBody_btnAddToCart');
+                if (addBtn) {
+                    addBtn.addEventListener('click', function () {
+                        var totalQty = 0;
+                        document.querySelectorAll('.pd-qty-display, .size-qty-input').forEach(function (inp) { totalQty += parseInt(inp.value) || 0; });
+                        dataLayer.push({ event: 'add_to_cart', ecommerce: { item_id: itemNumberEl.innerText, item_name: itemName, quantity: totalQty } });
+                    });
+                }
+            }
         });
+
+        // ── Enable/disable Add to Cart ─────────────────────────────
+        function pdCheckEnableButtons() {
+            var colorSection = document.querySelector('.pd-color-section');
+            var sizesContainer = document.querySelector('.sizes-container');
+            var hasAttributes = colorSection || sizesContainer;
+
+            var colorOk = !colorSection || colorSection.querySelector('.pd-swatch-selected') !== null;
+            var sizeOk = !sizesContainer || sizesContainer.querySelector('.size-btn.active') !== null;
+            var ok = !hasAttributes || (colorOk && sizeOk);
+
+            var addBtn = document.getElementById('<%=btnAddToCart.ClientID%>');
+            if (addBtn) addBtn.disabled = !ok;
+        }
+
+        // ── Size button selection ───────────────────────────────────
+        function pdSelectSize(btn) {
+            if (btn.disabled || btn.classList.contains('out-of-stock')) return false;
+
+            var container = btn.closest('.sizes-container');
+            if (!container) return false;
+
+            // Deselect all sizes in this container, clear their qty inputs
+            container.querySelectorAll('.size-btn').forEach(function (b) { b.classList.remove('active'); });
+            container.querySelectorAll('.size-qty-input').forEach(function (inp) { inp.value = ''; });
+
+            btn.classList.add('active');
+
+            // Sync hidden qty input with shared display
+            var qtySection = container.closest('.pd-size-section, .pd-group-attr-section') || container.parentElement;
+            // Walk up to find the shared qty section sibling
+            var parent = container.parentElement;
+            while (parent) {
+                var sharedSection = parent.querySelector('.shared-qty-section');
+                if (sharedSection) {
+                    sharedSection.style.display = 'block';
+                    var display = sharedSection.querySelector('.shared-qty-display');
+                    var selInput = btn.closest('.size-btn-item').querySelector('.size-qty-input');
+                    if (display && selInput) {
+                        selInput.value = display.value || 1;
+                    }
+                    // Update main price display and stock
+                    var priceEl = btn.closest('.size-btn-item').querySelector('.size-price');
+                    var stockEl = btn.closest('.size-btn-item').querySelector('.size-stock');
+                    var mainPrice = document.querySelector('.pd-price');
+                    if (mainPrice && priceEl && priceEl.textContent.trim()) {
+                        mainPrice.textContent = priceEl.textContent.trim();
+                    }
+                    var stockTarget = sharedSection.querySelector('.selected-size-stock');
+                    if (stockTarget && stockEl) stockTarget.textContent = stockEl.textContent;
+                    break;
+                }
+                parent = parent.parentElement;
+                if (parent && parent.classList && parent.classList.contains('pd-details-col')) break;
+            }
+
+            pdCheckEnableButtons();
+            return false;
+        }
+
+        function pdSyncSelectedQty(triggerEl, qty) {
+            var section = triggerEl.closest('.shared-qty-section');
+            if (!section) return;
+            // Walk up to find sizes container
+            var parent = section.parentElement;
+            while (parent) {
+                var container = parent.querySelector('.sizes-container');
+                if (container) {
+                    var activeInput = container.querySelector('.size-btn.active');
+                    if (activeInput) {
+                        var inp = activeInput.closest('.size-btn-item').querySelector('.size-qty-input');
+                        if (inp) inp.value = qty;
+                    }
+                    break;
+                }
+                parent = parent.parentElement;
+                if (!parent || parent.tagName === 'BODY') break;
+            }
+        }
+
+        // ── Thumbnail navigation ────────────────────────────────────
+        function pdThumbNav(dir) {
+            var thumbs = document.querySelectorAll('.pd-thumb');
+            if (!thumbs.length) return;
+            var active = -1;
+            thumbs.forEach(function (t, i) { if (t.classList.contains('active')) active = i; });
+            var next = (active + dir + thumbs.length) % thumbs.length;
+            thumbs.forEach(function (t) { t.classList.remove('active'); });
+            thumbs[next].classList.add('active');
+        }
     </script>
 
 </asp:Content>
+
 <asp:Content ID="Content4" ContentPlaceHolderID="cphFooter" runat="server">
     <uc1:SuperceedingItem ID="ucSuperceedingItem" runat="server" />
     <uc2:ImageModal ID="ucImageModal" runat="server" />

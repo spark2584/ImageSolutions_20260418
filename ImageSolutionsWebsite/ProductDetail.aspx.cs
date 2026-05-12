@@ -73,11 +73,6 @@ namespace ImageSolutionsWebsite
             mWebSiteTabID = Request.QueryString.Get("WebSiteTabID");
             mItemID = Request.QueryString.Get("id");
 
-            //if (CurrentWebsite.Name == "Discount Tire Corporate" || CurrentWebsite.Name == "Securitas")
-            //{
-                Response.Redirect("/ProductDetailDT.aspx?id=" + mItemID + "&WebSiteTabID=" + mWebSiteTabID);
-            //}
-
             if (string.IsNullOrEmpty(mWebSiteTabID))
             {
                 try
@@ -221,14 +216,15 @@ namespace ImageSolutionsWebsite
                     //litDetailedDescription.Text = _MyGroupItem.Item.DetailedDescription.Replace("<ul>", string.Empty).Replace("</ul>", string.Empty).Replace("<li>", " - ").Replace("</li>", "<br>");
                     litDetailedDescription.Text = string.Format(@"<br>{0}", litDetailedDescription.Text);
                 }
-                litBasePrice.Text = Convert.ToString(_MyGroupItem.Price);
+                string strPriceRange = _MyGroupItem.Item.PriceRange;
+                litBasePrice.Text = !string.IsNullOrEmpty(strPriceRange) ? strPriceRange : string.Format("{0:c}", _MyGroupItem.Price);
 
-                if (!string.IsNullOrEmpty(CurrentWebsite.CurrencyConvert) 
-                    && CurrentWebsite.CurrentyConvertPercentage != null 
+                if (!string.IsNullOrEmpty(CurrentWebsite.CurrencyConvert)
+                    && CurrentWebsite.CurrentyConvertPercentage != null
                     && CurrentWebsite.CurrentyConvertPercentage > 0)
                 {
                     litBasePrice.Text = string.Format(@"{0:c} USD <span style=""font-size: small; "" title=""est. {1:c} {2}""><i class=""ti-info-alt"" ></i> </span>"
-                        , Convert.ToString(_MyGroupItem.Price)
+                        , _MyGroupItem.Price
                         , Convert.ToDecimal(_MyGroupItem.Price) * CurrentWebsite.CurrentyConvertPercentage
                         , CurrentWebsite.CurrencyConvert
                         );
@@ -526,7 +522,7 @@ namespace ImageSolutionsWebsite
                     }
                 }
 
-                btnAddMore.Visible = phPersonalization.Visible || phLogo.Visible;
+                btnAddMore.Visible = false;
             }
             else
             {
@@ -1289,7 +1285,12 @@ namespace ImageSolutionsWebsite
 
         protected void btnAddToCart_Click(object sender, EventArgs e)
         {
-            AddToCart(true);            
+            AddToCart(true);
+        }
+
+        protected void btnBuyNow_Click(object sender, EventArgs e)
+        {
+            AddToCart(true);
         }
 
         public void AddToCart(bool gotoshoppingcart)
@@ -1645,31 +1646,25 @@ namespace ImageSolutionsWebsite
                 LinkButton lbnAttributeValue = (LinkButton)e.Item.FindControl("lbnAttributeValue");
                 HtmlControl liSelected = (HtmlControl)e.Item.FindControl("liSelected");
                 string strBackgroundColor = Convert.ToString(DataBinder.Eval(e.Item.DataItem, "BackgroundColor"));
-                liSelected.Style.Add("background-color", "#" + strBackgroundColor);
-                liSelected.Style.Add("border-color", "grey");
 
                 lbnAttributeValue.ToolTip = Convert.ToString(DataBinder.Eval(e.Item.DataItem, "Value"));
 
-                if (lbnAttributeValue.CommandArgument == mSelectedGroupByAttributeValueID)
+                if (!string.IsNullOrEmpty(strBackgroundColor))
                 {
-                    liSelected.Style.Add("border", "5px solid red");
+                    lbnAttributeValue.Style.Add("background-color", "#" + strBackgroundColor);
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(strBackgroundColor))
-                    {
-                        string strAbbreviation = Convert.ToString(DataBinder.Eval(e.Item.DataItem, "Abbreviation"));
-                        if (string.IsNullOrEmpty(strAbbreviation))
-                        {
-                            strAbbreviation = Convert.ToString(DataBinder.Eval(e.Item.DataItem, "Value"));
-                        }
+                    lbnAttributeValue.Style.Add("background-color", "#cccccc");
+                    string strAbbreviation = Convert.ToString(DataBinder.Eval(e.Item.DataItem, "Abbreviation"));
+                    if (string.IsNullOrEmpty(strAbbreviation))
+                        strAbbreviation = Convert.ToString(DataBinder.Eval(e.Item.DataItem, "Value"));
+                    lbnAttributeValue.Text = strAbbreviation.Length > 0 ? strAbbreviation.Substring(0, 1) : string.Empty;
+                }
 
-                        lbnAttributeValue.Text = strAbbreviation.Substring(0, 1);
-                    }
-                    else
-                    {
-                        //lbnAttributeValue.Text = "&nbsp;";
-                    }
+                if (lbnAttributeValue.CommandArgument == mSelectedGroupByAttributeValueID)
+                {
+                    lbnAttributeValue.CssClass += " pd-swatch-selected";
                 }
             }
         }
@@ -2733,36 +2728,33 @@ namespace ImageSolutionsWebsite
 
         protected void rptRelatedItem_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
-            try
+            if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem) return;
+
+            ImageSolutions.Item.MyGroupItem MyGroupItem = (ImageSolutions.Item.MyGroupItem)e.Item.DataItem;
+            Literal litColorSwatches = (Literal)e.Item.FindControl("litColorSwatches");
+            if (litColorSwatches == null) return;
+
+            string strSwatches = string.Empty;
+            if (MyGroupItem.Item != null && MyGroupItem.Item.Attributes != null)
             {
-                if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+                foreach (ImageSolutions.Attribute.Attribute objAttribute in MyGroupItem.Item.Attributes)
                 {
-                    //ImageSolutions.Item.MyGroupItem MyGroupItem = (ImageSolutions.Item.MyGroupItem)e.Item.DataItem;
-
-                    //ImageSolutions.Item.Item Item = new ImageSolutions.Item.Item(MyGroupItem.ItemID);
-
-                    //ImageSolutions.Attribute.Attribute Attribute = Item.Attributes.Find(x => x.AttributeName == "Color");
-
-                    //if (Attribute != null)
-                    //{
-                    //    List<ImageSolutions.Attribute.AttributeValue> AttributeValues = new List<ImageSolutions.Attribute.AttributeValue>();
-                    //    ImageSolutions.Attribute.AttributeValueFilter AttributeValueFilter = new ImageSolutions.Attribute.AttributeValueFilter();
-                    //    AttributeValueFilter.AttributeID = new Database.Filter.StringSearch.SearchFilter();
-                    //    AttributeValueFilter.AttributeID.SearchString = Attribute.AttributeID;
-                    //    AttributeValues = ImageSolutions.Attribute.AttributeValue.GetAttributeValues(AttributeValueFilter);
-
-                    //    Repeater rptColors = (Repeater)e.Item.FindControl("rptColors");
-                    //    List<ImageSolutions.Attribute.AttributeValue> objColors = AttributeValues;
-
-                    //    rptColors.DataSource = objColors;
-                    //    rptColors.DataBind();
-                    //}
+                    if (objAttribute.AttributeName.ToLower() == "color" && objAttribute.AttributeValues != null)
+                    {
+                        foreach (ImageSolutions.Attribute.AttributeValue objAttributeValue in objAttribute.AttributeValues)
+                        {
+                            string bg = Convert.ToString(objAttributeValue.BackgroundColor);
+                            string val = Convert.ToString(objAttributeValue.Value);
+                            string style = !string.IsNullOrEmpty(bg)
+                                ? string.Format("background-color:#{0};", bg)
+                                : "background-color:#ccc;";
+                            strSwatches += string.Format("<span class='color-dot' title='{0}' style='{1}'></span>", val, style);
+                        }
+                        break;
+                    }
                 }
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            litColorSwatches.Text = strSwatches;
         }
 
         protected void BindRelatedItem()
@@ -2782,7 +2774,7 @@ namespace ImageSolutionsWebsite
                 objFilter.IsOnline = true;
                 objFilter.Inactive = false;
 
-                objWebsiteTabItems = ImageSolutions.Website.WebsiteTabItem.GetWebsiteTabItems(objFilter, "Sort", true, ucPager.PageSize, ucPager.CurrentPageNumber, out intTotalRecord); ;
+                objWebsiteTabItems = ImageSolutions.Website.WebsiteTabItem.GetWebsiteTabItems(objFilter, "Sort", true, 100, 1, out intTotalRecord);
 
                 List<ImageSolutions.Item.MyGroupItem> MyGroupItems = new List<ImageSolutions.Item.MyGroupItem>();
 
@@ -2914,7 +2906,6 @@ namespace ImageSolutionsWebsite
                     this.rptRelatedItem.DataSource = MyGroupItems;
                     this.rptRelatedItem.DataBind();
 
-                    ucPager.TotalRecord = intTotalRecord;
                 }
                 else
                 {
@@ -2932,6 +2923,7 @@ namespace ImageSolutionsWebsite
                 objFilter = null;
             }
         }
+
 
     }
 }

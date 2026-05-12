@@ -26,6 +26,25 @@ namespace ImageSolutionsWebsite
 
             if (!Page.IsPostBack)
             {
+                // Restore selections from session (survive pager redirects)
+                if (Session["Items_SortValue"] != null)
+                {
+                    string saved = Session["Items_SortValue"].ToString();
+                    // Guard against stale values from old dropdown options
+                    if (ddlSort.Items.FindByValue(saved) != null)
+                        ddlSort.SelectedValue = saved;
+                }
+                if (Session["Items_PageSize"] != null)
+                    ddlPageSize.SelectedValue = Session["Items_PageSize"].ToString();
+                if (Session["Items_PriceMin"] != null)
+                    hfPriceMin.Value = Session["Items_PriceMin"].ToString();
+                if (Session["Items_PriceMax"] != null)
+                    hfPriceMax.Value = Session["Items_PriceMax"].ToString();
+                // Restore absolute max so slider range survives pager redirects
+                string absMaxKey = "Items_AbsMaxPrice_" + mWebSiteTabID + "_" + mSearch;
+                if (Session[absMaxKey] != null)
+                    hfPriceAbsMax.Value = Session[absMaxKey].ToString();
+
                 BindItems();
 
                 if (!string.IsNullOrEmpty(mWebSiteTabID))
@@ -129,7 +148,28 @@ namespace ImageSolutionsWebsite
                 objFilter.IsOnline = true;
                 objFilter.Inactive = false;
 
-                objWebsiteTabItems = ImageSolutions.Website.WebsiteTabItem.GetWebsiteTabItems(objFilter, "Sort", true, ucPager.PageSize, ucPager.CurrentPageNumber, out intTotalRecord); ;
+                // Apply selected page size
+                if (!string.IsNullOrEmpty(ddlPageSize.SelectedValue))
+                {
+                    int selectedPageSize = Convert.ToInt32(ddlPageSize.SelectedValue);
+                    ucPager.PageSize = selectedPageSize;
+                    ucPagerTop.PageSize = selectedPageSize;
+                }
+
+                // Determine sort field and direction from dropdown
+                string sortValue = string.IsNullOrEmpty(ddlSort.SelectedValue) ? "Relevance" : ddlSort.SelectedValue;
+                bool priceSort = sortValue.StartsWith("Price");
+                bool ascending = sortValue.EndsWith("_ASC");
+                string sortField = "Sort";   // DB sort field (used for Relevance)
+
+                // Pre-read price filter — when active, load all items so we can filter + page in memory
+                double prePriceMax = 0;
+                double.TryParse(hfPriceMax.Value, out prePriceMax);
+                bool isPriceFilterActive = prePriceMax > 0;
+                int qPageSize = isPriceFilterActive ? 100000 : ucPager.PageSize;
+                int qPageNum  = isPriceFilterActive ? 1 : ucPager.CurrentPageNumber;
+
+                objWebsiteTabItems = ImageSolutions.Website.WebsiteTabItem.GetWebsiteTabItems(objFilter, sortField, ascending, qPageSize, qPageNum, out intTotalRecord);
 
                 List<ImageSolutions.Item.MyGroupItem> MyGroupItems = new List<ImageSolutions.Item.MyGroupItem>();
 
@@ -455,6 +495,62 @@ and (
                     }
                 }
 
+                // Calculate the absolute price max.
+                // When the price filter is active we loaded ALL items, so we have the
+                // true global max — save it to Session so it survives paged (non-full) loads.
+                // When not all items are loaded, fall back to any cached Session value so
+                // the slider maximum never shrinks just because the page is filtered.
+                string absMaxSessionKey = "Items_AbsMaxPrice_" + mWebSiteTabID + "_" + mSearch;
+                if (MyGroupItems.Count > 0)
+                {
+                    double absMaxPrice = MyGroupItems.Select(x => Convert.ToDouble(x.Price)).Max();
+                    double newMax = Math.Ceiling(absMaxPrice);
+
+                    if (isPriceFilterActive)
+                    {
+                        // Full item set — this is the authoritative max; cache it
+                        Session[absMaxSessionKey] = newMax.ToString("0");
+                        hfPriceAbsMax.Value = newMax.ToString("0");
+                    }
+                    else
+                    {
+                        // Only a page of items — use cached max if available (more accurate)
+                        if (Session[absMaxSessionKey] != null)
+                            hfPriceAbsMax.Value = Session[absMaxSessionKey].ToString();
+                        else
+                            hfPriceAbsMax.Value = newMax.ToString("0");
+                    }
+                }
+
+                // Apply price filter (always filter when hfPriceMax has a value)
+                double filterMin = 0, filterMax = 0;
+                double.TryParse(hfPriceMin.Value, out filterMin);
+                double.TryParse(hfPriceMax.Value, out filterMax);
+                if (filterMax > 0)
+                {
+                    MyGroupItems = MyGroupItems
+                        .Where(x => Convert.ToDouble(x.Price) >= filterMin && Convert.ToDouble(x.Price) <= filterMax)
+                        .ToList();
+                }
+
+                // When price filter loaded all items, update total count and page in memory
+                if (isPriceFilterActive)
+                {
+                    intTotalRecord = MyGroupItems.Count;
+                    int startIdx = (ucPager.CurrentPageNumber - 1) * ucPager.PageSize;
+                    MyGroupItems = MyGroupItems.Skip(Math.Max(0, startIdx)).Take(ucPager.PageSize).ToList();
+                }
+
+                // Apply price sort in memory after filtering
+                // Uses the item's lowest available price so variants with multiple
+                // price points sort by their cheapest option.
+                if (priceSort)
+                {
+                    MyGroupItems = ascending
+                        ? MyGroupItems.OrderBy(x => GetMinPrice(x)).ToList()
+                        : MyGroupItems.OrderByDescending(x => GetMinPrice(x)).ToList();
+                }
+
                 this.rptItems.DataSource = MyGroupItems;
                 this.rptItems.DataBind();
                 if (!string.IsNullOrEmpty(mSearch))
@@ -468,7 +564,7 @@ and (
                 }
 
                 pnlAttributeFilter.Visible = CurrentWebsite.DisplayAttributeFilter;
-                ucLeftPanelNavigation.Visible = CurrentWebsite.DisplayLeftNavigation;
+                ucLeftPanelNavigation.Visible = false;
 
                 if (MyGroupItems.Count == 0 && pnlSubCategories.Visible)
                 {
@@ -484,9 +580,19 @@ and (
                     divLeftPanel.Visible = false;
                 }
 
+                // Always show attribute filters when there are attributes available
+                if (objColors.Count > 0 || objSizes.Count > 0)
+                {
+                    pnlAttributeFilter.Visible = true;
+                    divLeftPanel.Visible = true;
+                }
+
+                // Category sidebar section permanently hidden
+                pnlSidebarCategories.Visible = false;
+
                 if (!Page.IsPostBack)
                 {
-                    this.lvSize.DataSource = objSizes.Select(m => new { AttributeValue = m });
+                    this.lvSize.DataSource = SortSizes(objSizes).Select(m => new { AttributeValue = m });
                     this.lvSize.DataBind();
 
                     this.lvColor.DataSource = objColors.Select(m => new { AttributeValue = m });
@@ -557,6 +663,79 @@ and (
             var regex = new Regex(pattern);
             return regex.IsMatch(stringValue);
         }
+        protected void rptItems_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem) return;
+
+            ImageSolutions.Item.MyGroupItem MyGroupItem = (ImageSolutions.Item.MyGroupItem)e.Item.DataItem;
+            Literal litColorSwatches = (Literal)e.Item.FindControl("litColorSwatches");
+            if (litColorSwatches == null) return;
+
+            string strSwatches = string.Empty;
+
+            // Use the already-loaded object model exactly like ProductDetail.aspx does —
+            // BackgroundColor is stored without '#', so we prepend it.
+            if (MyGroupItem.Item != null && MyGroupItem.Item.Attributes != null)
+            {
+                foreach (ImageSolutions.Attribute.Attribute objAttribute in MyGroupItem.Item.Attributes)
+                {
+                    if (objAttribute.AttributeName.ToLower() == "color" && objAttribute.AttributeValues != null)
+                    {
+                        foreach (ImageSolutions.Attribute.AttributeValue objAttributeValue in objAttribute.AttributeValues)
+                        {
+                            string bg  = Convert.ToString(objAttributeValue.BackgroundColor);
+                            string val = Convert.ToString(objAttributeValue.Value);
+                            string style = !string.IsNullOrEmpty(bg)
+                                ? string.Format("background-color:#{0};", bg)
+                                : "background-color:#ccc;";
+                            strSwatches += string.Format(
+                                "<span class='color-dot' title='{0}' style='{1}'></span>", val, style);
+                        }
+                        break; // only the first Color attribute block needed
+                    }
+                }
+            }
+
+            litColorSwatches.Text = strSwatches;
+        }
+
+        // ── Price helper ─────────────────────────────────────────────────────────
+        // Returns the lowest available price for an item using already-loaded data
+        // only — no additional DB calls.
+        private double GetMinPrice(ImageSolutions.Item.MyGroupItem item)
+        {
+            double basePrice = Convert.ToDouble(item.Price);
+            return basePrice;
+        }
+
+        // ── Size ordering ────────────────────────────────────────────────────────
+        private static readonly List<string> _sizeOrder = new List<string>
+        {
+            "XXXXXXXS", "XXXXXXSS", "XXXXXXS", "XXXXXS", "XXXXS", "XXXS", "XXS", "XS",
+            "S", "M", "L", "XL", "XXL", "2XL",
+            "3XL", "4XL", "5XL", "6XL", "7XL", "8XL", "9XL", "10XL"
+        };
+
+        private List<string> SortSizes(List<string> sizes)
+        {
+            return sizes
+                .OrderBy(s =>
+                {
+                    int idx = _sizeOrder.FindIndex(o => o.Equals(s.Trim(), StringComparison.OrdinalIgnoreCase));
+                    return idx < 0 ? int.MaxValue : idx;   // unknown sizes go to the end
+                })
+                .ToList();
+        }
+
+        // ── Title-case helper (callable from .aspx via <%# ToTitleCase(...) %>) ─
+        protected string ToTitleCase(object value)
+        {
+            if (value == null) return string.Empty;
+            string s = value.ToString();
+            if (string.IsNullOrWhiteSpace(s)) return s;
+            return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(s.ToLower());
+        }
+
         protected void rptItems_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             if (e.CommandName == "AddItem")
@@ -594,6 +773,26 @@ and (
         protected void rptCategory_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
 
+        }
+
+        protected void ddlSort_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Session["Items_SortValue"] = ddlSort.SelectedValue;
+            BindItems();
+        }
+
+        protected void ddlPageSize_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Session["Items_PageSize"] = ddlPageSize.SelectedValue;
+            BindItems();
+        }
+
+        protected void btnApplyPrice_Click(object sender, EventArgs e)
+        {
+            // Persist price range to session so it survives pager redirects
+            Session["Items_PriceMin"] = hfPriceMin.Value;
+            Session["Items_PriceMax"] = hfPriceMax.Value;
+            BindItems();
         }
     }
 }
