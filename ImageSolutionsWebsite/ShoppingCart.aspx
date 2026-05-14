@@ -146,13 +146,62 @@
                             </asp:TemplateField>
                         </Columns>
                     </asp:GridView>
+
+                    <%-- Recommended Item Panel — columns match GridView: Image | Product Name | Unit Price | [Tariff] | Quantity | Remove Item | Item Total --%>
+                    <asp:Panel ID="pnlRecommended" runat="server" Visible="false" style="margin:0;">
+                        <asp:HiddenField ID="hfRecommendedItemID" runat="server" />
+                        <table class="table cart-table" style="border:2px solid #2196F3; margin-bottom:0; background-color:#fff;">
+                            <tr>
+                                <%-- Col 0: Image — same width as GridView image column --%>
+                                <td style="width:9%; vertical-align:top; text-align:left; padding:8px 8px 0 70px;">
+                                    <a id="aRecLink" runat="server">
+                                        <asp:Image ID="imgRecommended" runat="server" style="max-width:75px; max-height:75px;" />
+                                    </a>
+                                </td>
+                                <%-- Col 1: Product Name — no fixed width, takes remaining space --%>
+                                <td style="vertical-align:middle; padding:12px 8px;">
+                                    <div style="color:#2196F3; font-weight:bold; font-size:11px; letter-spacing:1px; margin-bottom:4px;">RECOMMENDED FOR YOU</div>
+                                    <asp:Label ID="lblRecName" runat="server" style="display:block; font-size:14px;" />
+                                </td>
+                                <%-- Col 2: Unit Price --%>
+                                <td style="width:13%; vertical-align:middle; text-align:center; padding:12px 8px;">
+                                    <h2 style="margin:0;"><asp:Label ID="lblRecPrice" runat="server" /></h2>
+                                    <asp:Label ID="lblRecCoveredByCredit" runat="server" Text="Covered by your credit" style="color:#2196F3; font-size:12px;" />
+                                </td>
+                                <%-- Col 3: Tariff Surcharge — visibility controlled in code-behind --%>
+                                <td id="tdRecTariff" runat="server" visible="false" style="width:13%; vertical-align:middle; text-align:center; padding:12px 8px;">
+                                    <h2 style="margin:0;">$0.00</h2>
+                                </td>
+                                <%-- Col 5: Quantity — editable --%>
+                                <td style="width:13%; vertical-align:middle; text-align:center; padding:12px 8px;">
+                                    <div class="qty-box">
+                                        <div class="input-group" style="justify-content:center;">
+                                            <asp:TextBox ID="txtRecQuantity" runat="server" type="number" CssClass="form-control input-number" Text="1" style="max-width:60px; text-align:center; background-color:#fff;" />
+                                        </div>
+                                    </div>
+                                </td>
+                                <%-- Col 8: Remove Item position — shows credit info --%>
+                                <td style="width:9%; vertical-align:middle; text-align:center; padding:12px 8px;">
+                                    <div style="font-size:12px; color:#777;">Your Available Credit</div>
+                                    <h2 style="margin:0; color:#333;"><asp:Label ID="lblAvailableCredit" runat="server" /></h2>
+                                </td>
+                                <%-- Col 10: Item Total position — ADD TO CART button, right-aligned --%>
+                                <td style="width:13%; vertical-align:middle; text-align:right; padding:12px 8px;">
+                                    <asp:Button ID="btnAddRecommended" runat="server" CssClass="btn btn-primary"
+                                        OnClick="btnAddRecommended_Click" CausesValidation="false"
+                                        style="white-space:normal; padding:8px 12px; background-color:#2196F3; border-color:#2196F3; margin-right:30px;" />
+                                </td>
+                            </tr>
+                        </table>
+                    </asp:Panel>
+
                     <div class="table-responsive-md">
                         <table class="table cart-table">
                             <tfoot>
                                 <asp:Panel ID="pnlCompanyInvoicedAmount" runat="server">
                                     <tr>
-                                        <td><asp:Literal ID="litCompanyInvoiced" runat="server" Text="Company Invoiced :"></asp:Literal></td>
-                                        <td>
+                                        <td style="text-align:right; padding-right:20px;"><asp:Literal ID="litCompanyInvoiced" runat="server" Text="Company Invoiced :"></asp:Literal></td>
+                                        <td style="width:13%; text-align:center;">
                                             <h2><asp:Label ID="lblCompanyInvoicedAmount" runat="server"></asp:Label></h2>
                                         </td>
                                     </tr>
@@ -160,8 +209,8 @@
 
                                 <asp:Panel ID="pnlDiscount" runat="server">
                                     <tr>
-                                        <td><asp:Literal ID="litDiscountLabel" runat="server" Text="Discount :"></asp:Literal></td>
-                                        <td>
+                                        <td style="text-align:right; padding-right:20px;"><asp:Literal ID="litDiscountLabel" runat="server" Text="Discount :"></asp:Literal></td>
+                                        <td style="width:13%; text-align:center;">
                                             <h2><asp:Label ID="lblDisocuntAmount" runat="server"></asp:Label></h2>
                                         </td>
                                     </tr>
@@ -169,8 +218,8 @@
                                 <tr>
 
                                 <tr>
-                                    <td><asp:LIteral ID="litOrderTotal" runat="server" Text="Order Total :"></asp:LIteral></td>
-                                    <td>
+                                    <td style="text-align:right; padding-right:20px;"><asp:LIteral ID="litOrderTotal" runat="server" Text="Order Total :"></asp:LIteral></td>
+                                    <td style="width:13%; text-align:center;">
                                         <h2><asp:Label ID="lblTotal" runat="server"></asp:Label></h2>
                                     </td>
                                 </tr>
@@ -201,7 +250,7 @@
             <div class="row cart-buttons">
 
                 <div class="col-6"><asp:Button id="btnContinueShopping" runat="server" CssClass="btn btn-solid" Text="Continue Shopping" OnClick="btnContinueShopping_Click" CausesValidation="false" /></div>
-                <div class="col-6"><asp:Button id="btnUpdateCart" runat="server" CssClass="btn btn-solid" Text="Update Cart" OnClick="btnUpdateCart_Click" CausesValidation="false" /> <asp:Button id="btnCheckOut" runat="server" CssClass="btn btn-solid" Text="Check Out" OnClick="btnCheckOut_Click" CausesValidation="false" /> <asp:Button id="btnTransfer" runat="server" CssClass="btn btn-solid" Text="Transfer" OnClick="btnTransfer_Click" CausesValidation="false" Visible="false"/></div>
+                <div class="col-6" style="display:flex; justify-content:flex-end; gap:8px;"><asp:Button id="btnCheckOut" runat="server" CssClass="btn btn-solid" Text="Check Out" OnClick="btnCheckOut_Click" CausesValidation="false" /> <asp:Button id="btnTransfer" runat="server" CssClass="btn btn-solid" Text="Transfer" OnClick="btnTransfer_Click" CausesValidation="false" Visible="false"/></div>
             </div>
         </div>
     </section>

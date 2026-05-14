@@ -1,4 +1,5 @@
-﻿using ImageSolutions.ShoppingCart;
+﻿using ImageSolutions.Item;
+using ImageSolutions.ShoppingCart;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -363,6 +364,8 @@ namespace ImageSolutionsWebsite
             this.lblTotal.Text = CurrentUser.CurrentUserWebSite.ShoppingCart.GetTotal(CurrentWebsite.WebsiteID, CurrentUser.CurrentUserWebSite.IsTaxExempt).ToString("C");
 
             if (this.gvShoppingCartLine.HeaderRow != null) this.gvShoppingCartLine.HeaderRow.TableSection = TableRowSection.TableHeader;
+
+            BindRecommendedItem();
         }
 
         protected void UpdateShoppingCart()
@@ -953,6 +956,154 @@ namespace ImageSolutionsWebsite
              catch (Exception ex)
             {
                 WebUtility.DisplayJavascriptMessage(this, ex.Message);
+            }
+        }
+
+        protected void BindRecommendedItem()
+        {
+            try
+            {
+                pnlRecommended.Visible = false;
+
+                // Only show when the user has at least one active budget assignment
+                if (CurrentUser.CurrentUserWebSite.MyBudgetAssignments == null ||
+                    !CurrentUser.CurrentUserWebSite.MyBudgetAssignments.Any(x => !x.BudgetAssignment.InActive))
+                    return;
+
+                double availableCredit = GetAvailableCredit();
+                if (availableCredit <= 0) return;
+
+                ItemWebsite candidate = GetRecommendedItemWebsite();
+                if (candidate == null || candidate.Item == null) return;
+
+                ImageSolutions.Item.Item item = candidate.Item;
+                if (string.IsNullOrEmpty(item.ImageURL)) return;
+
+                double unitPrice = 0;
+                if (item.OnlinePrice.HasValue && item.OnlinePrice.Value > 0)
+                    unitPrice = item.OnlinePrice.Value;
+                else if (item.BasePrice.HasValue && item.BasePrice.Value > 0)
+                    unitPrice = item.BasePrice.Value;
+                else if (item.ItemPricings != null && item.ItemPricings.Count > 0)
+                {
+                    string strWebsiteGroupID = CurrentUser.CurrentUserWebSite.CurrentUserAccount.WebsiteGroupID;
+                    ImageSolutions.Item.ItemPricing matchedPricing =
+                        item.ItemPricings.FirstOrDefault(p => p.WebsiteGroupID == strWebsiteGroupID)
+                        ?? item.ItemPricings.FirstOrDefault();
+                    if (matchedPricing != null)
+                        unitPrice = Convert.ToDouble(matchedPricing.Price);
+                }
+
+                string strProductDetailUrl = string.Format("/ProductDetail.aspx?id={0}",
+                    !string.IsNullOrEmpty(candidate.ParentID) ? candidate.ParentID : candidate.ItemID);
+
+                aRecLink.HRef           = strProductDetailUrl;
+                imgRecommended.ImageUrl  = item.ImageURL;
+                lblRecName.Text          = string.Format("{0}<br />{1}",
+                    System.Web.HttpUtility.HtmlEncode(item.ItemNumber),
+                    System.Web.HttpUtility.HtmlEncode(item.SalesDescription));
+                lblRecPrice.Text         = string.Format("{0:c}", unitPrice);
+                lblAvailableCredit.Text  = string.Format("{0:c}", availableCredit);
+                tdRecTariff.Visible      = CurrentWebsite.DisplayTariffCharge;
+
+                bool blnCovered = unitPrice <= availableCredit;
+                lblRecCoveredByCredit.Visible = blnCovered;
+                btnAddRecommended.Text        = blnCovered ? "ADD TO CART (FREE)" : "ADD TO CART";
+
+                hfRecommendedItemID.Value = candidate.ItemID;
+                pnlRecommended.Visible    = true;
+            }
+            catch
+            {
+                pnlRecommended.Visible = false;
+            }
+        }
+
+        private ItemWebsite GetRecommendedItemWebsite()
+        {
+            ItemWebsiteFilter objFilter = new ItemWebsiteFilter();
+            objFilter.WebsiteID = new Database.Filter.StringSearch.SearchFilter();
+            objFilter.WebsiteID.SearchString = CurrentWebsite.WebsiteID;
+            objFilter.InActive  = false;
+            objFilter.IsOnline  = true;
+
+            int intTotalCount = 0;
+            List<ItemWebsite> itemWebsites =
+                ItemWebsite.GetItemWebsites(objFilter, 50, 1, out intTotalCount);
+
+            if (itemWebsites == null || itemWebsites.Count == 0) return null;
+
+            // Exclude items already in the cart
+            List<string> cartItemIDs = CurrentUser.CurrentUserWebSite.ShoppingCart.ShoppingCartLines
+                .Select(l => l.ItemID).ToList();
+
+            // Prefer top-level (non-variant) items so the link goes to the right PDP
+            List<ItemWebsite> candidates = itemWebsites
+                .Where(iw => !cartItemIDs.Contains(iw.ItemID) && string.IsNullOrEmpty(iw.ParentID))
+                .ToList();
+
+            // Fall back to any item if no top-level candidates remain
+            if (candidates.Count == 0)
+                candidates = itemWebsites.Where(iw => !cartItemIDs.Contains(iw.ItemID)).ToList();
+
+            if (candidates.Count == 0) return null;
+
+            Random rnd = new Random();
+            return candidates[rnd.Next(candidates.Count)];
+        }
+
+        private double GetAvailableCredit()
+        {
+            List<ImageSolutions.Budget.MyBudgetAssignment> activeBudgets =
+                CurrentUser.CurrentUserWebSite.MyBudgetAssignments
+                    .FindAll(x => !x.BudgetAssignment.InActive);
+
+            double dblTotalBalance = activeBudgets.Sum(x => x.Balance);
+            double dblCartTotal    = Convert.ToDouble(
+                CurrentUser.CurrentUserWebSite.ShoppingCart.GetTotal(
+                    CurrentWebsite.WebsiteID, CurrentUser.CurrentUserWebSite.IsTaxExempt));
+
+            return Math.Max(0, dblTotalBalance - dblCartTotal);
+        }
+
+        protected void btnAddRecommended_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string strItemID = hfRecommendedItemID.Value;
+                if (string.IsNullOrEmpty(strItemID)) return;
+
+                ImageSolutions.Item.Item objItem = new ImageSolutions.Item.Item(strItemID);
+
+                double dblUnitPrice = 0;
+                if (objItem.OnlinePrice.HasValue && objItem.OnlinePrice.Value > 0)
+                    dblUnitPrice = objItem.OnlinePrice.Value;
+                else if (objItem.BasePrice.HasValue && objItem.BasePrice.Value > 0)
+                    dblUnitPrice = objItem.BasePrice.Value;
+                else if (objItem.ItemPricings != null && objItem.ItemPricings.Count > 0)
+                {
+                    string strWebsiteGroupID = CurrentUser.CurrentUserWebSite.CurrentUserAccount.WebsiteGroupID;
+                    ImageSolutions.Item.ItemPricing matchedPricing =
+                        objItem.ItemPricings.FirstOrDefault(p => p.WebsiteGroupID == strWebsiteGroupID)
+                        ?? objItem.ItemPricings.FirstOrDefault();
+                    if (matchedPricing != null)
+                        dblUnitPrice = Convert.ToDouble(matchedPricing.Price);
+                }
+
+                ImageSolutions.ShoppingCart.ShoppingCartLine objNewLine =
+                    new ImageSolutions.ShoppingCart.ShoppingCartLine();
+                objNewLine.ShoppingCartID = CurrentUser.CurrentUserWebSite.ShoppingCart.ShoppingCartID;
+                objNewLine.ItemID         = strItemID;
+                objNewLine.Quantity       = 1;
+                objNewLine.UnitPrice      = dblUnitPrice;
+                objNewLine.Create();
+
+                Response.Redirect("/ShoppingCart.aspx");
+            }
+            catch (Exception ex)
+            {
+                WebUtility.DisplayJavascriptMessage(this, ex.Message);
+                BindShoppingCart();
             }
         }
 
